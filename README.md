@@ -1,7 +1,7 @@
 # Numeral-Web-Scraper
 Web Scraper for extracting numerals of all languages from languagesandnumbers.com for later analysis. Saves them in a readible .csv format.
 ## Function
-Scrapes all numerals listed at [languagesandnumbers,com](https://www.languagesandnumbers.com/) from all 251 languages. Furthermore, the scraped numerals get saved in a CSV-File in the desired script-path which can be viewed in any editor for later analysis. A progress bar indicates how many websites are left.
+Scrapes all numerals listed at [languagesandnumbers.com](https://www.languagesandnumbers.com/) from all 251 languages. Furthermore, the scraped numerals get saved in a CSV-File in the desired script-path which can be viewed in any editor for later analysis. A progress bar indicates how many websites are left.
 ## Execution
 - Download the .exe-file from the [releases tab](https://github.com/mrtnbm/Web-Scraper-Public-/releases). Double-click to execute. OR
 - Unzip source code and start script with `python web-scraper-all.py`. You'll need to download the dependencies `requests` and `bs4`.
