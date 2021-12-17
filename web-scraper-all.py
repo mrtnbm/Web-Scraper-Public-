@@ -16,7 +16,7 @@ def parse_save_website(website_page, sel_lang=""):
     Parses HTML with lxml (faster than html.parser,
     see https://www.crummy.com/software/BeautifulSoup/bs4/doc/#improving-performance) and only saves a tags into a
     list
-    :param sel_lang: selected language if not all get scraped
+    :param sel_lang: selected language if not all should be scraped
     :param website_page: Response of server request :returns: None
     """
     if sel_lang == "":
@@ -50,7 +50,7 @@ def write_csv(string, path):
     filename = 'dataset.csv'
     full_path = os.path.join(path, filename)
     with open(full_path, 'w', newline='', encoding='utf-8-sig') as f:  # utf-8-sig forces Excel to open file with uft-8
-        f.write("lang;number;numeral\n")  # header
+        f.write("Language;Number;Numeral\n")  # header
         f.write(string)
 
 
@@ -85,6 +85,7 @@ def progress_bar(counter):
 
 def collapse(layout, key, visible):
     """
+    See https://stackoverflow.com/a/63471167
     Helper function that creates a Column that can be later made hidden, thus appearing "collapsed"
     :param layout: The layout for the section
     :param key: Key used to make this section visible / invisible
@@ -125,7 +126,7 @@ def create_main_window():
               [sg.Button("OK", font=("Helvetica", "10", "bold"), border_width=0), sg.Button("Exit", border_width=0)]]
 
     window = sg.Window('Web-Scraper', layout, finalize=True, resizable=True, auto_size_text=True,
-                       auto_size_buttons=True, no_titlebar=True, grab_anywhere=True, keep_on_top=True)
+                       auto_size_buttons=True, no_titlebar=False, grab_anywhere=True, keep_on_top=False)
 
     toggle_sec1 = True
 
@@ -133,7 +134,7 @@ def create_main_window():
         event, values = window.read()
         if event in (sg.WIN_CLOSED, 'Exit'):
             window.close()
-            sys.exit(1)
+            sys.exit(0)
         if event == "-CB-":
             toggle_sec1 = not toggle_sec1
             window['hidden_sec'].update(visible=toggle_sec1)
@@ -149,7 +150,7 @@ def create_main_window():
                     sg.theme('Dark Gray 13')
                     alt_values = sg.popup_get_text(
                         "Error: Values contains non integer values. Please enter integer values:", default_text="1,2,1",
-                        no_titlebar=True, keep_on_top=True, grab_anywhere=True)
+                        no_titlebar=False, keep_on_top=True, grab_anywhere=True)
                     if (values[0] or values[1] or values[2] or (
                             not is_alllang and values["inputtxt"])) is None or "" or alt_values is None:
                         sg.SystemTray.notify("Cancelled", "Closing program...", display_duration_in_ms=1000,
@@ -175,16 +176,23 @@ def create_main_window():
 
 
 def progress_bar_meter(counter):
+    """
+    Standard build-in progress meter from PySimpleGUI package customized in order to change the appearance a bit.
+    :param counter: The current iteration in the loop
+    :return: True/False
+    """
     sg.theme('Dark Gray 13')
     if selected_lang == "":
-        return sg.one_line_progress_meter('Scraping numerals...', counter + 1, len(lst_of_links), 'Scraping numerals...',
-                                      key='key', no_button=True, orientation='h', no_titlebar=True, grab_anywhere=True,
-                                      keep_on_top=True)
+        return sg.one_line_progress_meter('Scraping numerals...', counter + 1, len(lst_of_links),
+                                          'Scraping numerals...', no_button=True,
+                                          key='key1', orientation='h', no_titlebar=False, grab_anywhere=True,
+                                          keep_on_top=False, border_width=0)
     else:
-        return sg.one_line_progress_meter('Scraping numerals...', counter + 1, len(range(start, end, step)), 'Scraping numerals...',
-                                          key='key', no_button=True, orientation='h', no_titlebar=True,
-                                          grab_anywhere=True,
-                                          keep_on_top=True)
+        return sg.one_line_progress_meter('Scraping numerals...', counter + 1, len(range(start, end, step)),
+                                          'Scraping numerals...', no_button=True,
+                                          key='key2', orientation='h', no_titlebar=False,
+                                          grab_anywhere=True, border_width=0,
+                                          keep_on_top=False)
 
 
 if __name__ == '__main__':
@@ -216,6 +224,7 @@ if __name__ == '__main__':
             print("Error Connecting: ", errc)
             print("Trying again...")
             retries += 1
+            time.sleep(3)  # replugging ethernet cable is slow
         except requests.exceptions.Timeout as errt:
             print("Timeout Error: ", errt)
             print("Trying again...")
@@ -242,12 +251,18 @@ if __name__ == '__main__':
     retries = 0
     for link in lst_of_links:
         if selected_lang == "":
-            progress_bar_meter(count)
+            if not progress_bar_meter(count):
+                sg.SystemTray.notify("Cancelled", "Closing program...", display_duration_in_ms=1000,
+                                     fade_in_duration=200)
+                sys.exit(1)
         lang = find_lang_short(link)
 
         for i in range(start, end, step):
             if not selected_lang == "":
-                progress_bar_meter(count_inner)
+                if not progress_bar_meter(count_inner):
+                    sg.SystemTray.notify("Cancelled", "Closing program...", display_duration_in_ms=1000,
+                                         fade_in_duration=200)
+                    sys.exit(1)
             # requests.Session uses single TCP-connection for sending/receiving HTTP multi reqs/resps
             # saves time over opening a new connection for every single req/resp pair, see
             # https://en.wikipedia.org/wiki/HTTP_persistent_connection
@@ -312,13 +327,14 @@ if __name__ == '__main__':
             print("Couldn't write to file: ", erro)
 
             sg.theme('Dark Gray 13')
-            alt_path = sg.popup_get_folder("Error: Please enter a different folder name", no_titlebar=True,
+            alt_path = sg.popup_get_folder("Error: Please enter a different folder name", no_titlebar=False,
                                            grab_anywhere=True, keep_on_top=True)
             print("Trying again...")
             retries += 1
 
             if alt_path is None or "":
-                sg.SystemTray.notify("Cancel", "Closing program...", display_duration_in_ms=1000, fade_in_duration=200)
+                sg.SystemTray.notify("Cancelled", "Closing program...", display_duration_in_ms=1000,
+                                     fade_in_duration=200)
                 sys.exit(1)
         else:
             break
@@ -326,4 +342,5 @@ if __name__ == '__main__':
     seconds = time.time() - start_time
 
     sg.SystemTray.notify("Finished",
-                         str("Program executed in " + time.strftime("%H:%M:%S (hh:mm:ss)", time.gmtime(seconds))))
+                         str("Program executed in " + time.strftime("%H:%M:%S (hh:mm:ss)", time.gmtime(seconds))),
+                         display_duration_in_ms=1000, fade_in_duration=200)
