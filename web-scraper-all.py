@@ -8,7 +8,8 @@ from bs4 import BeautifulSoup, SoupStrainer
 
 CURRENT_WORKING_DIR = os.path.abspath(os.getcwd())
 MAX_RETRIES_REQ = 10
-# print = sg.Print
+
+print = sg.Print
 
 
 def parse_save_website(website_page, sel_lang=""):
@@ -36,8 +37,8 @@ def parse_save_website(website_page, sel_lang=""):
                     lst_of_links.append(link_el['href'])
                     break
         if len(lst_of_links) == 0:
-            sg.SystemTray.notify("Language not listed on website", "Closing program...", display_duration_in_ms=1000,
-                                 fade_in_duration=200, icon='warning-32.png')
+            sg.SystemTray.notify("Language not listed on website", "Closing program...", display_duration_in_ms=750,
+                                 fade_in_duration=100, icon='warning-32.png')
 
 
 def write_csv(string, path):
@@ -106,7 +107,7 @@ def create_main_window():
     sg.theme('Dark Gray 13')
 
     hidden_sec = [[sg.Text("Specific language that should be scraped:", border_width=0)],
-                  [sg.InputText(default_text="German", text_color="lightgray",
+                  [sg.InputText(default_text="", text_color="lightgray",
                                 tooltip="Enter the language which should be scraped.", key="inputtxt", border_width=0)]]
 
     layout = [[sg.Text("Start number for each language:", border_width=0)],
@@ -153,20 +154,18 @@ def create_main_window():
                         no_titlebar=False, keep_on_top=True, grab_anywhere=True)
                     if (values[0] or values[1] or values[2] or (
                             not is_alllang and values["inputtxt"])) is None or "" or alt_values is None:
-                        sg.SystemTray.notify("Cancelled", "Closing program...", display_duration_in_ms=1000,
-                                             fade_in_duration=200, icon='cancel-32.png')
+                        sg.SystemTray.notify("Cancelled", "Closing program...", display_duration_in_ms=750,
+                                             fade_in_duration=100, icon='cancel-32.png')
                         sys.exit(1)
 
                     try:
-                        print(values)
                         alt_values_split = alt_values.split(",")
                         values[0] = alt_values_split[0]
                         values[1] = alt_values_split[1]
                         values[2] = alt_values_split[2]
-                        print(alt_values_split)
                     except IndexError as erri:
-                        sg.SystemTray.notify("Too many retries", "Closing program...", display_duration_in_ms=1000,
-                                             fade_in_duration=200, icon='warning-32.png')
+                        sg.SystemTray.notify("Too many retries", "Closing program...", display_duration_in_ms=750,
+                                             fade_in_duration=100, icon='warning-32.png')
                         print("Index error:", erri)
                         sys.exit(1)
                 else:
@@ -182,17 +181,34 @@ def progress_bar_meter(counter):
     :return: True/False
     """
     sg.theme('Dark Gray 13')
+
     if selected_lang == "":
         return sg.one_line_progress_meter('Scraping numerals...', counter + 1, len(lst_of_links),
-                                          'Scraping numerals...', no_button=True,
-                                          key='key1', orientation='h', no_titlebar=False, grab_anywhere=True,
-                                          keep_on_top=False, border_width=0)
+                                          'Scraping numerals...', no_button=True, orientation='h', no_titlebar=False,
+                                          grab_anywhere=True, border_width=0)
     else:
         return sg.one_line_progress_meter('Scraping numerals...', counter + 1, len(range(start, end, step)),
-                                          'Scraping numerals...', no_button=True,
-                                          key='key2', orientation='h', no_titlebar=False,
-                                          grab_anywhere=True, border_width=0,
-                                          keep_on_top=False)
+                                          'Scraping numerals...', no_button=True, orientation='h', no_titlebar=False,
+                                          grab_anywhere=True, border_width=0)
+
+
+def enable_close_meter():
+    """
+    This method adds functionality to the 'X' button in the Windows title bar. Otherwise one is unable to exit the
+    progress bar with pressing 'X'.
+    :return: Bool
+    """
+    if selected_lang == "":
+        sg.one_line_progress_meter('Scraping numerals...', 1, len(lst_of_links), 'Scraping numerals...', no_button=True,
+                                   orientation='h', no_titlebar=False, grab_anywhere=True, border_width=0)
+    else:
+        sg.one_line_progress_meter('Scraping numerals...', 1, len(range(start, end, step)), 'Scraping numerals...',
+                                   no_button=True, orientation='h', no_titlebar=False, grab_anywhere=True,
+                                   border_width=0)
+
+    key = 'OK for 1 meter'
+    meter = sg.QuickMeter.active_meters[key]
+    meter.window.DisableClose = False
 
 
 if __name__ == '__main__':
@@ -205,14 +221,12 @@ if __name__ == '__main__':
     is_alllang = values["-CB-"]
     retries = 0
 
-    print("main:",values)
-
     start_time = time.time()  # log execution time of script
 
     while True:
         if retries > MAX_RETRIES_REQ:
-            sg.SystemTray.notify("Too many retries", "Closing program...", display_duration_in_ms=1000,
-                                 fade_in_duration=200, icon='warning-32.png')
+            sg.SystemTray.notify("Too many retries", "Closing program...", display_duration_in_ms=750,
+                                 fade_in_duration=100, icon='warning-32.png')
             sys.exit(1)
         try:
             # 3.05 because of TCP retransmission windows https://2.python-requests.org/en/master/user/advanced/#timeouts
@@ -240,7 +254,7 @@ if __name__ == '__main__':
 
     main_link = 'https://www.languagesandnumbers.com/'
 
-    sg.SystemTray.notify('Started Script', 'Scraping languagesandnumbers.com...', display_duration_in_ms=1000,
+    sg.SystemTray.notify('Started Script', 'Scraping languagesandnumbers.com...', display_duration_in_ms=750,
                          fade_in_duration=0)
 
     lst_of_links = []
@@ -251,19 +265,21 @@ if __name__ == '__main__':
     count = 0
     count_inner = 0
     retries = 0
+    enable_close_meter()
+
     for link in lst_of_links:
         if selected_lang == "":
             if not progress_bar_meter(count):
-                sg.SystemTray.notify("Cancelled", "Closing program...", display_duration_in_ms=1000,
-                                     fade_in_duration=200, icon='cancel-32.png')
+                sg.SystemTray.notify("Cancelled", "Closing program...", display_duration_in_ms=750, fade_in_duration=50,
+                                     icon='cancel-32.png')
                 sys.exit(1)
         lang = find_lang_short(link)
 
         for i in range(start, end, step):
             if not selected_lang == "":
                 if not progress_bar_meter(count_inner):
-                    sg.SystemTray.notify("Cancelled", "Closing program...", display_duration_in_ms=1000,
-                                         fade_in_duration=200, icon='cancel-32.png')
+                    sg.SystemTray.notify("Cancelled", "Closing program...", display_duration_in_ms=750,
+                                         fade_in_duration=100, icon='cancel-32.png')
                     sys.exit(1)
             # requests.Session uses single TCP-connection for sending/receiving HTTP multi reqs/resps
             # saves time over opening a new connection for every single req/resp pair, see
@@ -274,8 +290,8 @@ if __name__ == '__main__':
                 else:
                     while True:
                         if retries > MAX_RETRIES_REQ:
-                            sg.SystemTray.notify("Too many retries", "Closing program...", display_duration_in_ms=1000,
-                                                 fade_in_duration=200, icon='warning-32.png')
+                            sg.SystemTray.notify("Too many retries", "Closing program...", display_duration_in_ms=750,
+                                                 fade_in_duration=100, icon='warning-32.png')
                             sys.exit(1)
                         try:
                             # post to server with params for language and number and extract response
@@ -322,8 +338,8 @@ if __name__ == '__main__':
             elif retries == 0:
                 write_csv(lst_of_words, file_path)
             elif retries > MAX_RETRIES_REQ:
-                sg.SystemTray.notify("Max retries reached", "Closing program...", display_duration_in_ms=1000,
-                                     fade_in_duration=200, icon='warning-32.png')
+                sg.SystemTray.notify("Max retries reached", "Closing program...", display_duration_in_ms=750,
+                                     fade_in_duration=100, icon='warning-32.png')
                 sys.exit(1)
         except OSError as erro:
             print("Couldn't write to file: ", erro)
@@ -335,8 +351,8 @@ if __name__ == '__main__':
             retries += 1
 
             if alt_path is None or "":
-                sg.SystemTray.notify("Cancelled", "Closing program...", display_duration_in_ms=1000,
-                                     fade_in_duration=200, icon='cancel-32.png')
+                sg.SystemTray.notify("Cancelled", "Closing program...", display_duration_in_ms=750,
+                                     fade_in_duration=100, icon='cancel-32.png')
                 sys.exit(1)
         else:
             break
@@ -345,4 +361,4 @@ if __name__ == '__main__':
 
     sg.SystemTray.notify("Finished",
                          str("Program executed in " + time.strftime("%H:%M:%S (hh:mm:ss)", time.gmtime(seconds))),
-                         display_duration_in_ms=1000, fade_in_duration=200)
+                         display_duration_in_ms=750, fade_in_duration=100)
