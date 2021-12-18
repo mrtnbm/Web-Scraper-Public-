@@ -9,6 +9,9 @@ from bs4 import BeautifulSoup, SoupStrainer
 CURRENT_WORKING_DIR = os.path.abspath(os.getcwd())
 MAX_RETRIES_REQ = 10
 
+ICON_CANCEL = b'iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAACXBIWXMAAA7EAAAOxAGVKw4bAAACCklEQVRYhb2Xz0obURTGfwkhSCgiWQRXUvIAJfQBxEX7Dn2KLoovUIIElyW46rpI8QFEWwldhZKWVLoSEdylRUqooGIX/VzMDJmMd+aeySS5cDYzZ873zfl3zylhPIIq8AJ4CTwHmsAT4B9wC/wCvgEnwHEpeFb8CBqCXcEfgYzyV9AVbBQBrgi2Q2NW4KTcCXYEK3nB1wVfCgAnZaggZCbwpuBijuCR/Ba0fOCNBYHHSbg9ISgLThYIHsmpMycEr5cAHsluErwuGHs+OhN8MhjvC757dO6nQiFoez74GpIsK6jvNL2PgqqgJjj02HwfgVcEowzFC0E9RhbBO4feB0ElplfzeOJGsIpgy8N0oKANk0FiCjyW1D4vvLK4X4IDB0BEwgWOJ1STMBhYRrKfAlSeEVyCAYKfRmUniQLgElyh/J3PSWIGcAnGZeB/2h+lnCz9vLbIG4JHCZewlVaimSGwJmFatruS0EpiYC3DtAroet6ZynDTx1LuRtT1EDQ3ollasevvpkjI2opD5bcGL0SX0V6G3oEml9GR1/0xtpbr+Fy2gaWvYAbM0pm+jkMSyxxIOq4aXtZINlTamK5gKD1fIPjokesdJJ4uiMRI8CwTPOGJ3pzdbltMEjnxRsVXs7YSjSwvkYagI7jKAWxeTks5iFSBLYL1vEXg0rXw9TVwCfwAesBn63r+AFBlaRT3w8ejAAAAAElFTkSuQmCC '
+ICON_WARNING = b'iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAACXBIWXMAAA7EAAAOxAGVKw4bAAACDUlEQVRYhcXXz0sVURQH8M8MD5EIERdhISIuokUrg2gRBZUS1Z8hEW2iTbSPEKJ/IFr0w3/BiqiEdi0SFWtdWdFCCKHCkuq0mPfwNVjvzlPf+8JhmDtzzvd7zj1z751MIqK4HMYJHMII+uuPV/EWc5jFy4zfqbFbEfcFV4I3QSTau+Bq0LcVYsFksFKBuGwrwfkgr0reHzzYAnHZHgUDqeR7gqVtJG/YUjBY5stK5AN4joMtdC7jRWnsCIZb+L3C8YzPm2WeB48Ts5nexH860fdJc080N8cFTLTIYDtwChf/ElAv/fUOkDdwrdGUjQpcsrGodAL9uEwx7zVMdpC8gcmgluMo9nVBwCCO5RjvAnkD4znGuihgLMdoFwWM5lLX6J3BQLVdageQKw4T3cJqrthYuoXlGhYUx6wq2BUMlcfaELAgOLMDe3+qncuCXnzS2b2Aovf25hnfcbeNALM4W7enbfjfr3MTDAVrFUr3OuhpRApqwWIF/7Won55yyPiAGxXUz2SsN24yfmKmgv/NrPz1BT3BXGIG98oRgzuJvvPN1SsHGQ7eJwT5EZxu8puoj7Xy+xjFH9W/EexPFBH1eV8MfiWSH0iaoHol5rfxe59vmfkmInqDqcTS/m+qpqJYa9pDMBrcDr5VIP4S3ErJOmv1QpOQ3YrGO6k4RY3Y6OZ1xe/5Ap7hYcbXlLh/AHcmXTfceSpqAAAAAElFTkSuQmCC '
+
 print = sg.Print
 
 
@@ -38,7 +41,7 @@ def parse_save_website(website_page, sel_lang=""):
                     break
         if len(lst_of_links) == 0:
             sg.SystemTray.notify("Language not listed on website", "Closing program...", display_duration_in_ms=750,
-                                 fade_in_duration=100, icon='warning-32.png')
+                                 fade_in_duration=100, icon=ICON_WARNING)
 
 
 def write_csv(string, path):
@@ -155,7 +158,7 @@ def create_main_window():
                     if (values[0] or values[1] or values[2] or (
                             not is_alllang and values["inputtxt"])) is None or "" or alt_values is None:
                         sg.SystemTray.notify("Cancelled", "Closing program...", display_duration_in_ms=750,
-                                             fade_in_duration=100, icon='cancel-32.png')
+                                             fade_in_duration=100, icon=ICON_CANCEL)
                         sys.exit(1)
 
                     try:
@@ -165,7 +168,7 @@ def create_main_window():
                         values[2] = alt_values_split[2]
                     except IndexError as erri:
                         sg.SystemTray.notify("Too many retries", "Closing program...", display_duration_in_ms=750,
-                                             fade_in_duration=100, icon='warning-32.png')
+                                             fade_in_duration=100, icon=ICON_WARNING)
                         print("Index error:", erri)
                         sys.exit(1)
                 else:
@@ -226,7 +229,7 @@ if __name__ == '__main__':
     while True:
         if retries > MAX_RETRIES_REQ:
             sg.SystemTray.notify("Too many retries", "Closing program...", display_duration_in_ms=750,
-                                 fade_in_duration=100, icon='warning-32.png')
+                                 fade_in_duration=100, icon=ICON_WARNING)
             sys.exit(1)
         try:
             # 3.05 because of TCP retransmission windows https://2.python-requests.org/en/master/user/advanced/#timeouts
@@ -271,7 +274,7 @@ if __name__ == '__main__':
         if selected_lang == "":
             if not progress_bar_meter(count):
                 sg.SystemTray.notify("Cancelled", "Closing program...", display_duration_in_ms=750, fade_in_duration=50,
-                                     icon='cancel-32.png')
+                                     icon=ICON_CANCEL)
                 sys.exit(1)
         lang = find_lang_short(link)
 
@@ -279,7 +282,7 @@ if __name__ == '__main__':
             if not selected_lang == "":
                 if not progress_bar_meter(count_inner):
                     sg.SystemTray.notify("Cancelled", "Closing program...", display_duration_in_ms=750,
-                                         fade_in_duration=100, icon='cancel-32.png')
+                                         fade_in_duration=100, icon=ICON_CANCEL)
                     sys.exit(1)
             # requests.Session uses single TCP-connection for sending/receiving HTTP multi reqs/resps
             # saves time over opening a new connection for every single req/resp pair, see
@@ -291,7 +294,7 @@ if __name__ == '__main__':
                     while True:
                         if retries > MAX_RETRIES_REQ:
                             sg.SystemTray.notify("Too many retries", "Closing program...", display_duration_in_ms=750,
-                                                 fade_in_duration=100, icon='warning-32.png')
+                                                 fade_in_duration=100, icon=ICON_WARNING)
                             sys.exit(1)
                         try:
                             # post to server with params for language and number and extract response
@@ -339,7 +342,7 @@ if __name__ == '__main__':
                 write_csv(lst_of_words, file_path)
             elif retries > MAX_RETRIES_REQ:
                 sg.SystemTray.notify("Max retries reached", "Closing program...", display_duration_in_ms=750,
-                                     fade_in_duration=100, icon='warning-32.png')
+                                     fade_in_duration=100, icon=ICON_WARNING)
                 sys.exit(1)
         except OSError as erro:
             print("Couldn't write to file: ", erro)
@@ -352,7 +355,7 @@ if __name__ == '__main__':
 
             if alt_path is None or "":
                 sg.SystemTray.notify("Cancelled", "Closing program...", display_duration_in_ms=750,
-                                     fade_in_duration=100, icon='cancel-32.png')
+                                     fade_in_duration=100, icon=ICON_CANCEL)
                 sys.exit(1)
         else:
             break
