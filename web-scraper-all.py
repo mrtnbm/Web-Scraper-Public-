@@ -8,7 +8,7 @@ from bs4 import BeautifulSoup, SoupStrainer
 
 CURRENT_WORKING_DIR = os.path.abspath(os.getcwd())
 MAX_RETRIES_REQ = 10
-print = sg.Print
+# print = sg.Print
 
 
 def parse_save_website(website_page, sel_lang=""):
@@ -37,7 +37,7 @@ def parse_save_website(website_page, sel_lang=""):
                     break
         if len(lst_of_links) == 0:
             sg.SystemTray.notify("Language not listed on website", "Closing program...", display_duration_in_ms=1000,
-                                 fade_in_duration=200)
+                                 fade_in_duration=200, icon='warning-32.png')
 
 
 def write_csv(string, path):
@@ -154,19 +154,19 @@ def create_main_window():
                     if (values[0] or values[1] or values[2] or (
                             not is_alllang and values["inputtxt"])) is None or "" or alt_values is None:
                         sg.SystemTray.notify("Cancelled", "Closing program...", display_duration_in_ms=1000,
-                                             fade_in_duration=200)
+                                             fade_in_duration=200, icon='cancel-32.png')
                         sys.exit(1)
 
                     try:
+                        print(values)
                         alt_values_split = alt_values.split(",")
                         values[0] = alt_values_split[0]
                         values[1] = alt_values_split[1]
                         values[2] = alt_values_split[2]
-                        if not is_alllang:
-                            values[4] = alt_values_split[4]
+                        print(alt_values_split)
                     except IndexError as erri:
                         sg.SystemTray.notify("Too many retries", "Closing program...", display_duration_in_ms=1000,
-                                             fade_in_duration=200)
+                                             fade_in_duration=200, icon='warning-32.png')
                         print("Index error:", erri)
                         sys.exit(1)
                 else:
@@ -205,12 +205,14 @@ if __name__ == '__main__':
     is_alllang = values["-CB-"]
     retries = 0
 
+    print("main:",values)
+
     start_time = time.time()  # log execution time of script
 
     while True:
         if retries > MAX_RETRIES_REQ:
             sg.SystemTray.notify("Too many retries", "Closing program...", display_duration_in_ms=1000,
-                                 fade_in_duration=200)
+                                 fade_in_duration=200, icon='warning-32.png')
             sys.exit(1)
         try:
             # 3.05 because of TCP retransmission windows https://2.python-requests.org/en/master/user/advanced/#timeouts
@@ -253,7 +255,7 @@ if __name__ == '__main__':
         if selected_lang == "":
             if not progress_bar_meter(count):
                 sg.SystemTray.notify("Cancelled", "Closing program...", display_duration_in_ms=1000,
-                                     fade_in_duration=200)
+                                     fade_in_duration=200, icon='cancel-32.png')
                 sys.exit(1)
         lang = find_lang_short(link)
 
@@ -261,7 +263,7 @@ if __name__ == '__main__':
             if not selected_lang == "":
                 if not progress_bar_meter(count_inner):
                     sg.SystemTray.notify("Cancelled", "Closing program...", display_duration_in_ms=1000,
-                                         fade_in_duration=200)
+                                         fade_in_duration=200, icon='cancel-32.png')
                     sys.exit(1)
             # requests.Session uses single TCP-connection for sending/receiving HTTP multi reqs/resps
             # saves time over opening a new connection for every single req/resp pair, see
@@ -273,7 +275,7 @@ if __name__ == '__main__':
                     while True:
                         if retries > MAX_RETRIES_REQ:
                             sg.SystemTray.notify("Too many retries", "Closing program...", display_duration_in_ms=1000,
-                                                 fade_in_duration=200)
+                                                 fade_in_duration=200, icon='warning-32.png')
                             sys.exit(1)
                         try:
                             # post to server with params for language and number and extract response
@@ -321,7 +323,7 @@ if __name__ == '__main__':
                 write_csv(lst_of_words, file_path)
             elif retries > MAX_RETRIES_REQ:
                 sg.SystemTray.notify("Max retries reached", "Closing program...", display_duration_in_ms=1000,
-                                     fade_in_duration=200)
+                                     fade_in_duration=200, icon='warning-32.png')
                 sys.exit(1)
         except OSError as erro:
             print("Couldn't write to file: ", erro)
@@ -334,7 +336,7 @@ if __name__ == '__main__':
 
             if alt_path is None or "":
                 sg.SystemTray.notify("Cancelled", "Closing program...", display_duration_in_ms=1000,
-                                     fade_in_duration=200)
+                                     fade_in_duration=200, icon='cancel-32.png')
                 sys.exit(1)
         else:
             break
