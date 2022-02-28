@@ -202,31 +202,12 @@ def progress_bar_meter(counter):
 
     if selected_lang == "":
         return sg.one_line_progress_meter('Scraping numerals...', counter + 1, len(lst_of_links),
-                                          'Scraping numerals...', no_button=True, orientation='h', no_titlebar=False,
+                                          'Scraping numerals...', orientation='h', no_titlebar=False,
                                           grab_anywhere=True, border_width=0)
     else:
         return sg.one_line_progress_meter('Scraping numerals...', counter + 1, len(range(start, end, step)),
-                                          'Scraping numerals...', no_button=True, orientation='h', no_titlebar=False,
+                                          'Scraping numerals...', orientation='h', no_titlebar=False,
                                           grab_anywhere=True, border_width=0)
-
-
-def enable_close_meter():
-    """
-    This method adds functionality to the 'X' button in the Windows title bar. Otherwise one is unable to exit the
-    progress bar with pressing 'X'. [Not working properly, removed]
-    :return: Bool
-    """
-    if selected_lang == "":
-        sg.one_line_progress_meter('Scraping numerals...', 1, len(lst_of_links), 'Scraping numerals...', no_button=True,
-                                   orientation='h', no_titlebar=False, grab_anywhere=True, border_width=0)
-    else:
-        sg.one_line_progress_meter('Scraping numerals...', 1, len(range(start, end, step)), 'Scraping numerals...',
-                                   no_button=True, orientation='h', no_titlebar=False, grab_anywhere=True,
-                                   border_width=0)
-
-    # key = 'OK for 1 meter'
-    # meter = sg.QuickMeter.active_meters[key]
-    # meter.window.DisableClose = False
 
 
 if __name__ == '__main__':
@@ -283,7 +264,6 @@ if __name__ == '__main__':
     count = 0
     count_inner = 0
     retries = 0
-    enable_close_meter()
 
     for link in lst_of_links:
         if selected_lang == "":
