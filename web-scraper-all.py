@@ -138,7 +138,7 @@ def create_main_window():
               [sg.InputText(default_text=1, text_color="lightgray",
                             tooltip="Enter in what steps numbers should be scraped between Start-End", border_width=0)],
               [sg.Text("Path to csv file:", border_width=0)],
-              [sg.InputText(default_text=os.path.join('C', 'users', os.getlogin(), 'Documents'), text_color="lightgray",
+              [sg.InputText(default_text=CURRENT_WORKING_DIR, text_color="lightgray",
                             tooltip="Enter desired path for the csv-file!", border_width=0), sg.FolderBrowse()],
               [collapse(hidden_sec, 'hidden_sec', True)],
               [sg.Checkbox(text="Scrape all languages", default=False, key='-CB-', enable_events=True)],
@@ -213,7 +213,7 @@ def progress_bar_meter(counter):
 def enable_close_meter():
     """
     This method adds functionality to the 'X' button in the Windows title bar. Otherwise one is unable to exit the
-    progress bar with pressing 'X'.
+    progress bar with pressing 'X'. [Not working properly, removed]
     :return: Bool
     """
     if selected_lang == "":
@@ -224,9 +224,9 @@ def enable_close_meter():
                                    no_button=True, orientation='h', no_titlebar=False, grab_anywhere=True,
                                    border_width=0)
 
-    key = 'OK for 1 meter'
-    meter = sg.QuickMeter.active_meters[key]
-    meter.window.DisableClose = False
+    # key = 'OK for 1 meter'
+    # meter = sg.QuickMeter.active_meters[key]
+    # meter.window.DisableClose = False
 
 
 if __name__ == '__main__':
