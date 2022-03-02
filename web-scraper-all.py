@@ -1,13 +1,25 @@
+import logging
 import os
 import sys
 import time
+from datetime import datetime
 
 import PySimpleGUI as sg  # code convention, see PySimpleGUI docs
 import requests
 from bs4 import BeautifulSoup, SoupStrainer
 
+now = datetime.now()
+dt_string = now.strftime("%d%m%Y-%H%M%S")
+
+# create logger
+logger = logging.getLogger('web-scraper-all')
+logger.setLevel(logging.DEBUG)
+logging.basicConfig(filename='log_' + dt_string + '.log', encoding='utf-8', level=logging.DEBUG,
+                    format='%(asctime)s %(levelname)s %(message)s')
+
 CURRENT_WORKING_DIR = os.path.abspath(os.getcwd())
 MAX_RETRIES_REQ = 10
+HEADERS = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101 Firefox/78.0'}
 
 ICON_CANCEL = b'iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAACXBIWXMAAA7EAAAOxAGVKw4bAAACCklEQVRYhb2Xz0obURTGfwkhS' \
               b'CgiWQRXUvIAJfQBxEX7Dn2KLoovUIIElyW46rpI8QFEWwldhZKWVLoSEdylRUqooGIX/VzMDJmMd+aeySS5cDYzZ873zfl3zylhPI' \
@@ -165,7 +177,7 @@ def create_main_window():
                     int(values[1])
                     int(values[2])
                 except ValueError as eval:
-                    print("Values contains non integer values.:", eval)
+                    logging.error("Values contains non integer values.: %s", eval)
                     sg.theme('Dark Gray 13')
                     alt_values = sg.popup_get_text(
                         "Error: Values contains non integer values. Please enter integer values:", default_text="1,2,1",
@@ -184,7 +196,7 @@ def create_main_window():
                     except IndexError as erri:
                         sg.SystemTray.notify("Too many retries", "Closing program...", display_duration_in_ms=750,
                                              fade_in_duration=100, icon=ICON_WARNING)
-                        print("Index error:", erri)
+                        logging.error("Index error: %s", erri)
                         sys.exit(1)
                 else:
                     break
@@ -226,27 +238,28 @@ if __name__ == '__main__':
         if retries > MAX_RETRIES_REQ:
             sg.SystemTray.notify("Too many retries", "Closing program...", display_duration_in_ms=750,
                                  fade_in_duration=100, icon=ICON_WARNING)
+            logging.info('Reached max retries, closing program.')
             sys.exit(1)
         try:
             # 3.05 because of TCP retransmission windows https://2.python-requests.org/en/master/user/advanced/#timeouts
-            page = requests.get('https://www.languagesandnumbers.com/site-map/en/', timeout=3.05)
+            page = requests.get('https://www.languagesandnumbers.com/site-map/en/', headers=HEADERS, timeout=3.05)
             page.raise_for_status()  # raises error if status code is between 400-600
         except requests.exceptions.HTTPError as errh:  # handling server error codes
-            print("HTTP error: ", errh)
-            print("Trying again...")
+            logging.error('1 HTTPError: %s', errh)
+            logging.info("Trying again...")
             retries += 1
         except requests.exceptions.ConnectionError as errc:
-            print("Error Connecting: ", errc)
-            print("Trying again...")
+            logging.error('1 ConnError: %s', errc)
+            logging.info("Trying again...")
             retries += 1
             time.sleep(3)  # replugging ethernet cable is slow
         except requests.exceptions.Timeout as errt:
-            print("Timeout Error: ", errt)
-            print("Trying again...")
+            logging.error('1 TimeoutError: %s', errt)
+            logging.info("Trying again...")
             retries += 1
         except requests.exceptions.RequestException as err:  # safety-net for any unspecified exception
-            print("Unspecified error: ", err)
-            print("Trying again...")
+            logging.error('1 UnspecifiedError: %s', err)
+            logging.info("Trying again...")
             retries += 1
         else:
             break
@@ -266,16 +279,33 @@ if __name__ == '__main__':
     retries = 0
 
     for link in lst_of_links:
+        page = requests.get(main_link + link, headers=HEADERS)
+        soup = BeautifulSoup(page.content, features="lxml", parse_only=SoupStrainer(id='number-form'))
+        form = soup.find_all(id='number-form')
+
+        lang = find_lang_short(link)
+        if not form:
+            logging.warning(
+                'No form available for %s (%s): Skipping invisible submit-form in order to avoid scrape detection.',
+                str(lang), str(find_lang_long(link)))
+            # lst_of_words = lst_of_words + find_lang_long(link) + ";" + '-1' + ";" + "Language not supported.\n"
+            continue
         if selected_lang == "":
             if not progress_bar_meter(count):
+                logging.info('Process cancelled by clicking cancel button for link %s.', str(link))
                 sg.SystemTray.notify("Cancelled", "Closing program...", display_duration_in_ms=750, fade_in_duration=50,
                                      icon=ICON_CANCEL)
                 sys.exit(1)
-        lang = find_lang_short(link)
 
         for i in range(start, end, step):
+            # POST method is not working on the ajax server with numbers > 12
+            if lang == 'pld' and i > 12:
+                logging.warning("POSTING HTTP to ajax server is not supported for %s with values larger than 12.",
+                                str(lang))
+                continue
             if not selected_lang == "":
                 if not progress_bar_meter(count_inner):
+                    logging.info('Progress cancelled (inner) for i=%s and link=%s', str(i), str(link))
                     sg.SystemTray.notify("Cancelled", "Closing program...", display_duration_in_ms=750,
                                          fade_in_duration=100, icon=ICON_CANCEL)
                     sys.exit(1)
@@ -283,48 +313,57 @@ if __name__ == '__main__':
             # saves time over opening a new connection for every single req/resp pair, see
             # https://en.wikipedia.org/wiki/HTTP_persistent_connection
             with requests.Session() as session:
-                if lang == "kor":  # korean is not supported
-                    continue
-                else:
-                    while True:
-                        if retries > MAX_RETRIES_REQ:
-                            sg.SystemTray.notify("Too many retries", "Closing program...", display_duration_in_ms=750,
-                                                 fade_in_duration=100, icon=ICON_WARNING)
-                            sys.exit(1)
-                        try:
-                            # post to server with params for language and number and extract response
-                            response = session.post('https://www.languagesandnumbers.com/ajax/en', timeout=3.05,
-                                                    data={"numberz": i, "lang": lang})
-                            response.raise_for_status()
-                        except requests.exceptions.HTTPError as errh:
-                            print("HTTP error: ", errh)
-                            print("Trying again...")
-                            retries += 1
-                        except requests.exceptions.ConnectionError as errc:
-                            print("Error Connecting: ", errc)
-                            print("Trying again...")
-                            retries += 1
-                            time.sleep(3)  # replugging ethernet cable is slow
-                        except requests.exceptions.Timeout as errt:
-                            print("Timeout Error: ", errt)
-                            print("Trying again...")
-                            retries += 1
-                        except requests.exceptions.RequestException as err:
-                            print("Unspecified error: ", err)
-                            print("Trying again...")
-                            retries += 1
-                        else:
-                            break
-
-                    # parse response
-                    soup = BeautifulSoup(response.content, "lxml", from_encoding="utf-8")
-
-                    # if number is not supported by server, mark row with XYZ for later filtering (dirty)
-                    if soup.get_text().split(':')[-1] == "This number is too big":
-                        lst_of_words = lst_of_words + find_lang_long(link) + ";" + str(i) + ";" + "XYZ\n"
+                while True:
+                    if retries > MAX_RETRIES_REQ:
+                        logging.info('Too many retries while trying to post query i=%s and link=%s', str(i),
+                                     str(link))
+                        sg.SystemTray.notify("Too many retries", "Closing program...", display_duration_in_ms=750,
+                                             fade_in_duration=100, icon=ICON_WARNING)
+                        sys.exit(1)
+                    try:
+                        # post to server with params for language and number and extract response
+                        response = session.post('https://www.languagesandnumbers.com/ajax/en', headers=HEADERS,
+                                                timeout=3.05,
+                                                data={"numberz": i, "lang": lang})
+                        logging.info('POST method - params: {numberz: %s, lang: %s (%s)}', str(i), str(lang),
+                                     str(find_lang_long(link)))
+                        # time.sleep(random.uniform(1, 2))  # sleep between 2 and 3 seconds
+                        response.raise_for_status()
+                    except requests.exceptions.HTTPError as errh:
+                        logging.error("HTTPError while retrieving response of %s: %s", str(lang), errh)
+                        logging.info("Trying again...")
+                        retries += 1
+                    except requests.exceptions.ConnectionError as errc:
+                        logging.error("ConnError while retrieving response of %s: %s", str(lang), errc)
+                        logging.info("Trying again...")
+                        retries += 1
+                        time.sleep(3)  # replugging ethernet cable is slow
+                    except requests.exceptions.Timeout as errt:
+                        logging.error("TimeError while retrieving response of %s: %s", str(lang), errt)
+                        logging.info("Trying again...")
+                        retries += 1
+                    except requests.exceptions.RequestException as err:
+                        logging.error("UnspecifiedError while retrieving response of %s: %s", str(lang), err)
+                        logging.info("Trying again...")
+                        retries += 1
                     else:
-                        lst_of_words = lst_of_words + find_lang_long(link) + ";" + str(i) + ";" + \
-                                       soup.get_text(separator=" ", strip=True).split(':')[-1] + "\n"
+                        break
+
+                # parse response
+                soup = BeautifulSoup(response.content, "lxml", from_encoding="utf-8")
+
+                # if number is not supported by server, ignore it
+                # soup.get_text().split(':')[-1].split('.')[0] == "This number is too big":
+                if soup.get_text().split(':', 3)[-1].split('.')[0] == "This number is too big":
+                    logging.warning("Not supported. This number is too big. (Lang: %s (%s))", str(lang),
+                                    str(find_lang_long(link)))
+                    # lst_of_words = lst_of_words + find_lang_long(link) + ";" + str(
+                    #    i) + ";" + "Not supported, number too big.\n"
+                    break
+                else:
+                    # soup.get_text(separator=" ", strip=True).split(':', 3)[-1]
+                    lst_of_words = lst_of_words + find_lang_long(link) + ";" + str(i) + ";" + \
+                                   soup.get_text(separator=" ", strip=True).split(':', 3)[-1] + "\n"
             count_inner += 1
         count += 1
     alt_path = ""
@@ -336,19 +375,21 @@ if __name__ == '__main__':
             elif retries == 0:
                 write_csv(lst_of_words, file_path)
             elif retries > MAX_RETRIES_REQ:
+                logging.warning("Max retries reached while trying to write .csv file, closing program.")
                 sg.SystemTray.notify("Max retries reached", "Closing program...", display_duration_in_ms=750,
                                      fade_in_duration=100, icon=ICON_WARNING)
                 sys.exit(1)
         except OSError as erro:
-            print("Couldn't write to file: ", erro)
+            logging.error("Could not write to file: %s", erro)
 
             sg.theme('Dark Gray 13')
             alt_path = sg.popup_get_folder("Error: Please enter a different folder name", no_titlebar=False,
                                            grab_anywhere=True, keep_on_top=True)
-            print("Trying again...")
+            logging.info("Trying again...")
             retries += 1
 
             if alt_path is None or "":
+                logging.info("Cancelled operation, closing program.")
                 sg.SystemTray.notify("Cancelled", "Closing program...", display_duration_in_ms=750,
                                      fade_in_duration=100, icon=ICON_CANCEL)
                 sys.exit(1)
@@ -357,6 +398,7 @@ if __name__ == '__main__':
 
     seconds = time.time() - start_time
 
+    logging.info("Program executed in %s", time.strftime("%H:%M:%S (hh:mm:ss)", time.gmtime(seconds)))
     sg.SystemTray.notify("Finished",
                          str("Program executed in " + time.strftime("%H:%M:%S (hh:mm:ss)", time.gmtime(seconds))),
                          display_duration_in_ms=750, fade_in_duration=100)
