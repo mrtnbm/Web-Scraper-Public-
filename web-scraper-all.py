@@ -11,9 +11,6 @@ from bs4 import BeautifulSoup, SoupStrainer
 now = datetime.now()
 dt_string = now.strftime("%d%m%Y-%H%M%S")
 
-# create logger
-logger = logging.getLogger('web-scraper-all')
-logger.setLevel(logging.DEBUG)
 logging.basicConfig(filename='log_' + dt_string + '.log', encoding='utf-8', level=logging.DEBUG,
                     format='%(asctime)s %(levelname)s %(message)s')
 
