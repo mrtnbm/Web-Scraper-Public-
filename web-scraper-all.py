@@ -11,7 +11,7 @@ from bs4 import BeautifulSoup, SoupStrainer
 now = datetime.now()
 dt_string = now.strftime("%d%m%Y-%H%M%S")
 
-logging.basicConfig(filename='log_' + dt_string + '.log', encoding='utf-8', level=logging.DEBUG,
+logging.basicConfig(filename=dt_string + '.log', encoding='utf-8', level=logging.DEBUG,
                     format='%(asctime)s %(levelname)s %(message)s')
 
 CURRENT_WORKING_DIR = os.path.abspath(os.getcwd())
@@ -246,7 +246,7 @@ if __name__ == '__main__':
             logging.info("Trying again...")
             retries += 1
         except requests.exceptions.ConnectionError as errc:
-            logging.error('1 ConnError: %s', errc)
+            logging.error('1 ConnectionError: %s', errc)
             logging.info("Trying again...")
             retries += 1
             time.sleep(3)  # replugging ethernet cable is slow
@@ -331,12 +331,12 @@ if __name__ == '__main__':
                         logging.info("Trying again...")
                         retries += 1
                     except requests.exceptions.ConnectionError as errc:
-                        logging.error("ConnError while retrieving response of %s: %s", str(lang), errc)
+                        logging.error("ConnectionError while retrieving response of %s: %s", str(lang), errc)
                         logging.info("Trying again...")
                         retries += 1
                         time.sleep(3)  # replugging ethernet cable is slow
                     except requests.exceptions.Timeout as errt:
-                        logging.error("TimeError while retrieving response of %s: %s", str(lang), errt)
+                        logging.error("TimeOutError while retrieving response of %s: %s", str(lang), errt)
                         logging.info("Trying again...")
                         retries += 1
                     except requests.exceptions.RequestException as err:
