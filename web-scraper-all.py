@@ -16,9 +16,9 @@ logging.basicConfig(filename=dt_string + '.log', encoding='utf-8', level=logging
                     format='%(asctime)s %(levelname)s %(message)s')
 
 CURRENT_WORKING_DIR = os.path.abspath(os.getcwd())
-MAX_RETRIES_REQ = 10
+MAX_RETRIES_REQ = 164
 HEADERS = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101 Firefox/78.0'}
-REQ_TIMEOUT = 50
+REQ_TIMEOUT = 3.05
 
 ICON_CANCEL = b'iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAACXBIWXMAAA7EAAAOxAGVKw4bAAACCklEQVRYhb2Xz0obURTGfwkhS' \
               b'CgiWQRXUvIAJfQBxEX7Dn2KLoovUIIElyW46rpI8QFEWwldhZKWVLoSEdylRUqooGIX/VzMDJmMd+aeySS5cDYzZ873zfl3zylhPI' \
