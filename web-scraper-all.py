@@ -1,5 +1,6 @@
 import logging
 import os
+import random
 import sys
 import time
 from datetime import datetime
@@ -17,6 +18,7 @@ logging.basicConfig(filename=dt_string + '.log', encoding='utf-8', level=logging
 CURRENT_WORKING_DIR = os.path.abspath(os.getcwd())
 MAX_RETRIES_REQ = 10
 HEADERS = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101 Firefox/78.0'}
+REQ_TIMEOUT = 50
 
 ICON_CANCEL = b'iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAACXBIWXMAAA7EAAAOxAGVKw4bAAACCklEQVRYhb2Xz0obURTGfwkhS' \
               b'CgiWQRXUvIAJfQBxEX7Dn2KLoovUIIElyW46rpI8QFEWwldhZKWVLoSEdylRUqooGIX/VzMDJmMd+aeySS5cDYzZ873zfl3zylhPI' \
@@ -239,7 +241,8 @@ if __name__ == '__main__':
             sys.exit(1)
         try:
             # 3.05 because of TCP retransmission windows https://2.python-requests.org/en/master/user/advanced/#timeouts
-            page = requests.get('https://www.languagesandnumbers.com/site-map/en/', headers=HEADERS, timeout=3.05)
+            page = requests.get('https://www.languagesandnumbers.com/site-map/en/', headers=HEADERS,
+                                timeout=REQ_TIMEOUT)
             page.raise_for_status()  # raises error if status code is between 400-600
         except requests.exceptions.HTTPError as errh:  # handling server error codes
             logging.error('1 HTTPError: %s', errh)
@@ -320,11 +323,13 @@ if __name__ == '__main__':
                     try:
                         # post to server with params for language and number and extract response
                         response = session.post('https://www.languagesandnumbers.com/ajax/en', headers=HEADERS,
-                                                timeout=3.05,
+                                                timeout=REQ_TIMEOUT,
                                                 data={"numberz": i, "lang": lang})
                         logging.info('POST method - params: {numberz: %s, lang: %s (%s)}', str(i), str(lang),
                                      str(find_lang_long(link)))
-                        # time.sleep(random.uniform(1, 2))  # sleep between 2 and 3 seconds
+
+                        time.sleep(random.uniform(1, 3))  # sleep between 1 and 3 seconds to avoid server timeouts
+
                         response.raise_for_status()
                     except requests.exceptions.HTTPError as errh:
                         logging.error("HTTPError while retrieving response of %s: %s", str(lang), errh)
