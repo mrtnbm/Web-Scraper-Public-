@@ -1,7 +1,7 @@
 apiVersion: backstage.io/v1alpha1
 kind: Component
 metadata:
-  name: Web-Scraper-Public-
+  name: WebScraper
   annotations:
     github.com/project-slug: mrtnbm/Web-Scraper-Public-
     # The Sentry organization is stored in the app-config.yaml of the Backstage instance.
