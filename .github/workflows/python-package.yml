@@ -53,3 +53,8 @@ jobs:
         args: # optional
         # Set the sonar.projectBaseDir analysis property
         projectBaseDir: # optional, default is .
+    - name: CycloneDX Python Generate SBOM
+      uses: CycloneDX/gh-python-generate-sbom@master
+      with:
+        output: sbom-report.json
+
