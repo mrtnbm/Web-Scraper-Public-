@@ -58,4 +58,5 @@ jobs:
       with:
         input: requirements.txt
         output: sbom-report.json
+        args: "-r"
 
