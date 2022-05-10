@@ -19,3 +19,5 @@ Scrapes all numerals listed at [languagesandnumbers.com](https://www.languagesan
   ![image](https://user-images.githubusercontent.com/49289399/145732832-71deabe4-26da-445e-ba60-669a7f1b6202.png)
 ## TODO
 - Test-Cases for all functions (achieve coverage >= 75%)
+- refactor main (more seperate functions, less code in main)
+- refactor to meet OOP standards
