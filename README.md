@@ -21,3 +21,4 @@ Scrapes all numerals listed at [languagesandnumbers.com](https://www.languagesan
 - Test-Cases for all functions (achieve coverage >= 75%)
 - refactor main (more seperate functions, less code in main)
 - refactor to meet OOP standards
+- fix all code smells
