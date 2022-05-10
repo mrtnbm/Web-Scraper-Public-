@@ -56,5 +56,6 @@ jobs:
     - name: CycloneDX Python Generate SBOM
       uses: CycloneDX/gh-python-generate-sbom@master
       with:
+        input: requirements.txt
         output: sbom-report.json
 
