@@ -30,8 +30,9 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        python -m pip install flake8 pytest
+        python -m pip install flake8 pytest cyclonedx-bom
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+        pip freeze > requirements-frozen.txt
     - name: Lint with flake8
       run: |
         # stop the build if there are Python syntax errors or undefined names
@@ -54,9 +55,5 @@ jobs:
         # Set the sonar.projectBaseDir analysis property
         projectBaseDir: # optional, default is .
     - name: CycloneDX Python Generate SBOM
-      uses: CycloneDX/gh-python-generate-sbom@master
-      with:
-        input: requirements.txt
-        output: sbom-report.json
-        args: "-r"
-
+      run: |
+        cyclonedx-bom -r -i requirements-frozen.txt -o sbom-report.json
