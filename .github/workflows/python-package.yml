@@ -57,3 +57,10 @@ jobs:
     - name: CycloneDX Python Generate SBOM
       run: |
         cyclonedx-bom -r -i requirements-frozen.txt -o sbom-report.json
+    - name: Dependency Track Upload SBOM for Vulnerability Analysis and Visualization
+      uses: DependencyTrack/gh-upload-sbom@v1.0.0
+      with:
+        serverhostname: 'localhost'
+        apikey: ${{ secrets.DEPENDENCYTRACK_APIKEY }}
+        projectname: 'web_scraper_all-${{github.ref_name}}'
+        projectversion: '${{github.ref_name}}'
