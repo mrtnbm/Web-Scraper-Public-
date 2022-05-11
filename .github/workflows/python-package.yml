@@ -64,3 +64,5 @@ jobs:
         apikey: ${{ secrets.DEPENDENCYTRACK_APIKEY }}
         projectname: 'web_scraper_all-${{github.ref_name}}'
         projectversion: '${{github.ref_name}}'
+        autocreate: 'true'
+        bomfilename: 'sbom-report.json'
