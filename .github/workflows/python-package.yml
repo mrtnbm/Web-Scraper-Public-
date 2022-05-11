@@ -62,7 +62,6 @@ jobs:
       with:
         serverhostname: ${{ secrets.DT_SERVER_IP }}
         port: '8081'
-        protocol: 'http'
         apikey: ${{ secrets.DEPENDENCYTRACK_APIKEY }}
         projectname: 'web_scraper_all-${{github.ref_name}}'
         projectversion: '${{github.ref_name}}'
