@@ -31,7 +31,7 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        python -m pip install flake8 pytest cyclonedx-bom
+        python -m pip install flake8 pytest cyclonedx-bom pyinstaller
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
         pip freeze > requirements-frozen.txt
     - name: Lint with flake8
@@ -58,6 +58,19 @@ jobs:
     - name: CycloneDX Python Generate SBOM
       run: |
         cyclonedx-bom -r -i requirements-frozen.txt -o sbom-report.json
+    - name: Build Artifacts
+      run: |
+        pyinstaller -wF web_scraper_all.py
+    - name: Archive Artifacts - SBOM
+      uses: actions/upload-artifact@v3
+      with:
+        name: web-scraper-sbom
+        path: sbom-report.json
+    - name: Archive Artifacts - Executable
+      uses: actions/upload-artifact@v3
+      with:
+        name: web-scraper-executable
+        path: dist/*.exe
     #- name: Dependency Track Upload SBOM for Vulnerability Analysis and Visualization
     #  uses: DependencyTrack/gh-upload-sbom@v1.0.0
     #  with:
