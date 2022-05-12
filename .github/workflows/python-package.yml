@@ -5,7 +5,7 @@ name: Python package & analysis
 
 on:
   push:
-    branches: [ main, github* ]
+    branches: [ main, github-action-autobuild-test-python ]
   pull_request:
     branches: [ main ]
   workflow_dispatch:
