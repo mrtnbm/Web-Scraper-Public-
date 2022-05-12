@@ -23,10 +23,6 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     steps:
-    - name: Test ports
-    # curl -v http://${{ secrets.DT_SERVER_IP_1 }}:8081
-      run: |
-        curl -v http://${{ secrets.DT_SERVER_IP_1 }}:8081
     - uses: actions/checkout@v3
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v3
@@ -62,13 +58,13 @@ jobs:
     - name: CycloneDX Python Generate SBOM
       run: |
         cyclonedx-bom -r -i requirements-frozen.txt -o sbom-report.json
-    - name: Dependency Track Upload SBOM for Vulnerability Analysis and Visualization
-      uses: DependencyTrack/gh-upload-sbom@v1.0.0
-      with:
-        serverhostname: ${{ secrets.DT_SERVER_IP }}
-        port: '8081'
-        apikey: ${{ secrets.DEPENDENCYTRACK_APIKEY }}
-        projectname: 'web_scraper_all-${{github.ref_name}}'
-        projectversion: '${{github.ref_name}}'
-        autocreate: 'true'
-        bomfilename: 'sbom-report.json'
+    #- name: Dependency Track Upload SBOM for Vulnerability Analysis and Visualization
+    #  uses: DependencyTrack/gh-upload-sbom@v1.0.0
+    #  with:
+    #    serverhostname: ${{ secrets.DT_SERVER_IP }}
+    #    port: '8081'
+    #    apikey: ${{ secrets.DEPENDENCYTRACK_APIKEY }}
+    #    projectname: 'web_scraper_all-${{github.ref_name}}'
+    #    projectversion: '${{github.ref_name}}'
+    #    autocreate: 'true'
+    #    bomfilename: 'sbom-report.json'
