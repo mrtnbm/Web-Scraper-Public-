@@ -25,8 +25,9 @@ jobs:
     steps:
     - name: Test ports
       # curl -v http://${{ secrets.DT_SERVER_IP }}:8081
+      # curl -v http://${{ secrets.DT_SERVER_IP_1 }}:8081
       run: |
-        curl -v http://${{ secrets.DT_SERVER_IP_1 }}:8081
+        curl -v http://${{ DT_SERVER_IP_W }}:8081
     - uses: actions/checkout@v3
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v3
