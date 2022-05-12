@@ -57,7 +57,7 @@ jobs:
         projectBaseDir: # optional, default is .
     - name: CycloneDX Python Generate SBOM
       run: |
-        cyclonedx-bom -r -i requirements-frozen.txt -o sbom-report.json
+        cyclonedx-bom -r -i requirements-frozen.txt --format json --schema-version 1.4 -o sbom-report.json
     - name: Build Artifacts
       run: |
         pyinstaller -wF web_scraper_all.py
