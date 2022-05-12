@@ -61,23 +61,14 @@ jobs:
       run: cyclonedx-bom -r -i requirements-frozen.txt --format json --schema-version 1.4 -o sbom-report.json
     - name: Build Artifacts
       run: pyinstaller -wF web_scraper_all.py
-    - name: Archive Artifacts - Docs
+    - name: Archive Artifacts - Docs, SBOMs, Executables
       uses: actions/upload-artifact@v3
       with:
-        name: web-scraper-docs
-        path: ./docs/*.html
-        if-no-files-found: error
-    - name: Archive Artifacts - SBOM
-      uses: actions/upload-artifact@v3
-      with:
-        name: web-scraper-sbom
-        path: sbom-report.json
-        if-no-files-found: error
-    - name: Archive Artifacts - Executable
-      uses: actions/upload-artifact@v3
-      with:
-        name: web-scraper-executable
-        path: dist/*.exe
+        name: web-scraper-artifacts
+        path: | 
+          ./docs/*.html
+          dist/*.exe
+          sbom-report.json
         if-no-files-found: error
     #- name: Dependency Track Upload SBOM for Vulnerability Analysis and Visualization
     #  uses: DependencyTrack/gh-upload-sbom@v1.0.0
