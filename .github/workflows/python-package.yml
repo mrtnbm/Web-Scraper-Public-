@@ -63,9 +63,6 @@ jobs:
     - name: Build Artifacts
       run: |
         pyinstaller -wF web_scraper_all.py
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
     - name: Archive Artifacts - Docs
       uses: actions/upload-artifact@v3
       with:
