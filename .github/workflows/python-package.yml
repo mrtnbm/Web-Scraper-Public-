@@ -82,14 +82,14 @@ jobs:
     - name: Archive Artifacts - Docs
       uses: actions/upload-artifact@v3
       with:
-        name: web-scraper-artifacts
+        name: web-scraper-docs
         path: docs/*
         if-no-files-found: error
 
     - name: Archive Artifacts - SBOM, Coverage, Linting
       uses: actions/upload-artifact@v3
       with:
-        name: web-scraper-artifacts
+        name: web-scraper-reports
         path: | 
           reports/*
         if-no-files-found: error
@@ -97,7 +97,7 @@ jobs:
     - name: Archive Artifacts - Executables
       uses: actions/upload-artifact@v3
       with:
-        name: web-scraper-artifacts
+        name: web-scraper-executable
         path: | 
           dist/*.exe
         if-no-files-found: error
