@@ -32,7 +32,7 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        python -m pip install flake8 pytest cyclonedx-bom pyinstaller pdoc bandit
+        python -m pip install flake8 pytest cyclonedx-bom pyinstaller pdoc bandit pylint
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
         pip freeze > requirements-frozen.txt
 
@@ -91,7 +91,7 @@ jobs:
         path: | 
           reports/*
         if-no-files-found: error
-        
+
     - name: Archive Artifacts - Executables
       uses: actions/upload-artifact@v3
       with:
