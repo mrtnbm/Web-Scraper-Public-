@@ -28,23 +28,36 @@ jobs:
       uses: actions/setup-python@v3
       with:
         python-version: ${{ matrix.python-version }}
+
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        python -m pip install flake8 pytest cyclonedx-bom pyinstaller pdoc
+        python -m pip install flake8 pytest cyclonedx-bom pyinstaller pdoc bandit
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
         pip freeze > requirements-frozen.txt
+
     - name: Lint with flake8
       run: |
         # stop the build if there are Python syntax errors or undefined names
-        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+        flake8 . --count --show-source --statistics
         # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
-        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+        flake8 . --count --show-source --statistics --color=always --output-file=flake8-issues.txt ./reports --exit-zero --max-complexity=10 --max-line-length=127
+
+    - name: Test for security vulnerabilities with bandit
+      run: |
+        bandit -f json -o ./reports/bandit-issues.json
+
+    - name: Lint with Pylint
+      run: |
+        pylint --reports=y --output-format=json:./reports/pylint-issues.json,colorized
+
     - name: Test with pytest
       run: |
         pytest
+
     - name: Generate docs
       run: pdoc ./web_scraper_all.py -o ./docs
+
     - name: SonarCloud Scan
       # You may pin to the exact commit or the version.
       # uses: SonarSource/sonarcloud-github-action@de2e56b42aa84d0b1c5b622644ac17e505c9a049
@@ -57,18 +70,34 @@ jobs:
         args: # optional
         # Set the sonar.projectBaseDir analysis property
         projectBaseDir: # optional, default is .
+
     - name: CycloneDX Python Generate SBOM
-      run: cyclonedx-bom -r -i requirements-frozen.txt --format json --schema-version 1.4 -o sbom-report.json
+      run: cyclonedx-bom -r -i requirements-frozen.txt --format json --schema-version 1.4 -o ./reports/sbom-report.json
+
     - name: Build Artifacts
       run: pyinstaller -wF web_scraper_all.py
-    - name: Archive Artifacts - Docs, SBOMs, Executables
+
+    - name: Archive Artifacts - Docs
+      uses: actions/upload-artifact@v3
+      with:
+        name: web-scraper-artifacts
+        path: docs/*
+        if-no-files-found: error
+
+    - name: Archive Artifacts - SBOM, Coverage, Linting
       uses: actions/upload-artifact@v3
       with:
         name: web-scraper-artifacts
         path: | 
-          ./docs/*.html
+          reports/*
+        if-no-files-found: error
+        
+    - name: Archive Artifacts - Executables
+      uses: actions/upload-artifact@v3
+      with:
+        name: web-scraper-artifacts
+        path: | 
           dist/*.exe
-          sbom-report.json
         if-no-files-found: error
     #- name: Dependency Track Upload SBOM for Vulnerability Analysis and Visualization
     #  uses: DependencyTrack/gh-upload-sbom@v1.0.0
