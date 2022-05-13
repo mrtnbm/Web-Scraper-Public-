@@ -45,7 +45,7 @@ jobs:
 
     - name: Test for security vulnerabilities with bandit
       run: |
-        bandit -f json -o ./reports/bandit-issues.json --exit-zero
+        bandit -f json -o reports/bandit-issues.json -v --exit-zero
 
     - name: Lint with Pylint
       run: |
