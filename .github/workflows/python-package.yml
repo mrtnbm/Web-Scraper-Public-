@@ -49,7 +49,7 @@ jobs:
 
     - name: Lint with Pylint
       run: |
-        pylint web_scraper_all.py --reports=y --output-format=json:./reports/pylint-issues.json,colorized
+        pylint web_scraper_all.py --reports=y --output-format=json:./reports/pylint-issues.json,colorized --exit-zero
 
     - name: Test with pytest
       run: |
