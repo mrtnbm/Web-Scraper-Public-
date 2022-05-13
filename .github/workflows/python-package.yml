@@ -39,9 +39,9 @@ jobs:
     - name: Lint with flake8
       run: |
         # stop the build if there are Python syntax errors or undefined names
-        flake8 . --count --show-source --statistics
+        # flake8 . --count --show-source --statistics
         # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
-        flake8 . --count --show-source --statistics --color=always --output-file=flake8-issues.txt ./reports --exit-zero --max-complexity=10 --max-line-length=127
+        flake8 . --count --show-source --statistics --color=always --output-file=flake8-issues.txt ./reports --exit-zero --max-complexity=10
 
     - name: Test for security vulnerabilities with bandit
       run: |
