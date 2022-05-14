@@ -78,6 +78,9 @@ jobs:
       with:
         output: codacy-issues.sarif
         format: sarif
+        exclude_paths: |
+          test*.*
+          reports/*
         # Adjust severity of non-security issues
         gh-code-scanning-compat: true
         # Force 0 exit code to allow SARIF file generation
