@@ -95,7 +95,7 @@ jobs:
         project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
         # or
         # api-token: ${{ secrets.CODACY_API_TOKEN }}
-        coverage-reports: coverage_codacy.xml
+        coverage-reports: coverage.xml
 
     - name: CycloneDX Python Generate SBOM
       run: cyclonedx-bom -r -i requirements-frozen.txt --format json --schema-version 1.4 -o ./reports/sbom-report.json
