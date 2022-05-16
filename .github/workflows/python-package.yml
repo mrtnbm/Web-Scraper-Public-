@@ -55,7 +55,7 @@ jobs:
 
     - name: Test with pytest
       run: |
-        coverage run --source=web_scraper_all.py -m pytest && coverage xml
+        coverage run -m pytest && coverage xml
 
     - name: Generate docs
       run: pdoc ./web_scraper_all.py -o ./docs
