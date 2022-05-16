@@ -34,7 +34,7 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        python -m pip install flake8 pytest cyclonedx-bom pyinstaller pdoc bandit pylint
+        python -m pip install flake8 pytest cyclonedx-bom pyinstaller pdoc bandit pylint coverage
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
         pip freeze > requirements-frozen.txt
 
@@ -55,7 +55,7 @@ jobs:
 
     - name: Test with pytest
       run: |
-        pytest
+        coverage run --source=web_scraper_all.py -m pytest && coverage xml
 
     - name: Generate docs
       run: pdoc ./web_scraper_all.py -o ./docs
