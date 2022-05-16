@@ -72,8 +72,6 @@ jobs:
         args: # optional
         # Set the sonar.projectBaseDir analysis property
         projectBaseDir: # optional, default is .
-    - name: Checkout code
-      uses: actions/checkout@main
     - name: Run Codacy Analysis CLI
       uses: codacy/codacy-analysis-cli-action@master
       with:
