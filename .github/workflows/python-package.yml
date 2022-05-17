@@ -148,7 +148,7 @@ jobs:
       with:
         # Optional. Commit message for the created commit.
         # Defaults to "Apply automatic changes"
-        commit_message: ${{ github.GTIHUB_WORKFLOW }}${{ github.GITHUB_JOB }}-${{ github.GITHUB_RUN_NUMBER }}':' Commit & Push Artifacts
+        commit_message: ${{ github.GTIHUB_WORKFLOW }}${{ github.GITHUB_JOB }}-${{ github.GITHUB_RUN_NUMBER }} Commit & Push Artifacts
 
         # Optional glob pattern of files which should be added to the commit
         # Defaults to all (.)
