@@ -43,19 +43,23 @@ jobs:
         # stop the build if there are Python syntax errors or undefined names
         # flake8 . --count --show-source --statistics
         # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
+        git rm --ignore-unmatch reports/flake8-issues.txt
         flake8 web_scraper_all.py --count --show-source --statistics --output-file=./reports/flake8-issues.txt --exit-zero --max-complexity 10 --max-line-length 127
 
     - name: Test for security vulnerabilities with bandit
       run: |
+        git rm --ignore-unmatch reports/bandit-issues.json
         bandit web_scraper_all.py -f json -o reports/bandit-issues.json -v --exit-zero
 
     - name: Lint with Pylint
       run: |
-        pylint web_scraper_all.py --reports=y --output-format=json:./reports/pylint-issues.json,colorized --exit-zero
+        git rm --ignore-unmatch reports/pylint-issues.json
+        pylint web_scraper_all.py --reports=y --output-format=json:reports/pylint-issues.json,colorized --exit-zero
 
     - name: Test with pytest
       run: |
-        coverage run -m pytest && coverage xml -o ./reports/coverage.xml
+        git rm --ignore-unmatch reports/coverage.xml
+        coverage run -m pytest && coverage xml -o reports/coverage.xml
 
     - name: Generate docs
       run: pdoc ./web_scraper_all.py -o ./docs
@@ -82,7 +86,7 @@ jobs:
 
     - name: CycloneDX Python Generate SBOM
       run: |
-        git rm ./reports/sbom-report.json
+        git rm --ignore-unmatch reports/sbom-report.json
         cyclonedx-bom -r -i requirements-frozen.txt --format json --schema-version 1.4 -o ./reports/sbom-report.json
 
     - name: Build Artifacts
