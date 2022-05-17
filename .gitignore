@@ -109,6 +109,7 @@ build/
 develop-eggs/
 dist/*
 !dist/web_scraper_all.exe
+!dist/web_scraper_all
 downloads/
 eggs/
 .eggs/
