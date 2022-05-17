@@ -13,7 +13,7 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     steps:
-    -name: Echo
+    - name: Echo
       run: |
         echo ${ github.workflow }${ github.job }-${ github.run.number }
         echo ${{ github.workflow }}${{ github.job }}-${{ github.run.number }}
