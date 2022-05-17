@@ -139,17 +139,17 @@ jobs:
 
     - name: debug
       run: ls -lah .
-      
+
     - name: Commit & Push Artifacts to Repo
       uses: stefanzweifel/git-auto-commit-action@v4
-        with:
-          # Optional. Commit message for the created commit.
-          # Defaults to "Apply automatic changes"
-          commit_message: ${{ github.GTIHUB_WORKFLOW }}${{ github.GITHUB_JOB }}-${{ github.GITHUB_RUN_NUMBER }}':' Commit & Push Artifacts
+      with:
+        # Optional. Commit message for the created commit.
+        # Defaults to "Apply automatic changes"
+        commit_message: ${{ github.GTIHUB_WORKFLOW }}${{ github.GITHUB_JOB }}-${{ github.GITHUB_RUN_NUMBER }}':' Commit & Push Artifacts
 
-          # Optional glob pattern of files which should be added to the commit
-          # Defaults to all (.)
-          # See the `pathspec`-documentation for git
-          # - https://git-scm.com/docs/git-add#Documentation/git-add.txt-ltpathspecgt82308203
-          # - https://git-scm.com/docs/gitglossary#Documentation/gitglossary.txt-aiddefpathspecapathspec
-          file_pattern: docs/* dist/* reports/* coverage.xml
+        # Optional glob pattern of files which should be added to the commit
+        # Defaults to all (.)
+        # See the `pathspec`-documentation for git
+        # - https://git-scm.com/docs/git-add#Documentation/git-add.txt-ltpathspecgt82308203
+        # - https://git-scm.com/docs/gitglossary#Documentation/gitglossary.txt-aiddefpathspecapathspec
+        file_pattern: docs/* dist/* reports/* coverage.xml
