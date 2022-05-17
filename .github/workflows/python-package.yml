@@ -135,3 +135,5 @@ jobs:
     #    projectversion: '${{github.ref_name}}'
     #    autocreate: 'true'
     #    bomfilename: 'sbom-report.json'
+    - name: debug
+      run: ls -lah .
