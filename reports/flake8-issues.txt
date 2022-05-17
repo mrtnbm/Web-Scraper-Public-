@@ -5303,3 +5303,10 @@ web_scraper_all.py:224:1: C901 'If 224' is too complex (32)
 if __name__ == '__main__':
 ^
 2     C901 'create_main_window' is too complex (11)
+web_scraper_all.py:129:1: C901 'create_main_window' is too complex (11)
+def create_main_window():
+^
+web_scraper_all.py:224:1: C901 'If 224' is too complex (32)
+if __name__ == '__main__':
+^
+2     C901 'create_main_window' is too complex (11)
