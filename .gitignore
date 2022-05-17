@@ -108,8 +108,8 @@ __pycache__/
 build/
 develop-eggs/
 dist/*
-!dist/web-scraping.exe
-!dist/web-scraper-all.exe
+!dist/web_scraper_all.exe
+!dist/web_scraper_all
 downloads/
 eggs/
 .eggs/
@@ -143,7 +143,6 @@ htmlcov/
 .coverage.*
 .cache
 nosetests.xml
-coverage.xml
 *.cover
 *.py,cover
 .hypothesis/
