@@ -7,19 +7,19 @@ jobs:
       - uses: actions/checkout@master
       - name: Remove old snyk report
         run: |
-          git rm --ignore-unmatch ${{ github.workspace }}/reports/snyk-issues.sarif
-          git rm --ignore-unmatch ${{ github.workspace }}/reports/snyk.json
+          git rm --ignore-unmatch reports/snyk-issues.sarif
+          git rm --ignore-unmatch reports/snyk.json
       - name: Run Snyk to check for vulnerabilities
         uses: snyk/actions/python@master
         continue-on-error: true # To make sure that SARIF upload gets called
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
-          args: --sarif-file-output=./reports/snyk-issues.sarif --json-file-output=./reports/snyk-issues.json --exclude=test,reports,dist,docs,md,yml,js,index,html
+          args: --sarif-file-output=reports/snyk-issues.sarif --json-file-output=reports/snyk-issues.json
       - name: Upload result to GitHub Code Scanning
         uses: github/codeql-action/upload-sarif@v1
         with:
-          sarif_file: ./reports/snyk-issues.sarif
+          sarif_file: reports/snyk-issues.sarif
 
       - name: Git Pull
         run: git pull
@@ -35,4 +35,4 @@ jobs:
           # See the `pathspec`-documentation for git
           # - https://git-scm.com/docs/git-add#Documentation/git-add.txt-ltpathspecgt82308203
           # - https://git-scm.com/docs/gitglossary#Documentation/gitglossary.txt-aiddefpathspecapathspec
-          file_pattern: ./reports/snyk-issues.sarif ./reports/snyk-issues.json
+          file_pattern: reports/snyk-issues.sarif reports/snyk-issues.json
