@@ -17,7 +17,7 @@ jobs:
       - name: Run Codacy Analysis CLI
         uses: codacy/codacy-analysis-cli-action@master
         with:
-          output: codacy-issues.sarif
+          output: ./reports/codacy-issues.sarif
           format: sarif
           directory: ${GITHUB_WORKSPACE}/web_scraper_all.py
           # Adjust severity of non-security issues
@@ -30,4 +30,20 @@ jobs:
       - name: Upload SARIF results file
         uses: github/codeql-action/upload-sarif@main
         with:
-          sarif_file: codacy-issues.sarif
+          sarif_file: ./reports/codacy-issues.sarif
+      
+      - name: Git Pull
+        run: git pull
+      - name: Commit & Push Artifacts to Repo
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          # Optional. Commit message for the created commit.
+          # Defaults to "Apply automatic changes"
+          commit_message: ${{ github.workflow }}${{ github.job }}-${{ github.run_number }} Commit & Push Artifacts
+
+          # Optional glob pattern of files which should be added to the commit
+          # Defaults to all (.)
+          # See the `pathspec`-documentation for git
+          # - https://git-scm.com/docs/git-add#Documentation/git-add.txt-ltpathspecgt82308203
+          # - https://git-scm.com/docs/gitglossary#Documentation/gitglossary.txt-aiddefpathspecapathspec
+          file_pattern: ./reports/codacy-issues.sarif
