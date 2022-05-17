@@ -138,7 +138,10 @@ jobs:
     #    bomfilename: 'sbom-report.json'
 
     - name: debug
-      run: ls -lah .
+      run: |
+        ls -lah .
+        cd dist/
+        ls -lah .
 
     - name: Commit & Push Artifacts to Repo
       uses: stefanzweifel/git-auto-commit-action@v4
