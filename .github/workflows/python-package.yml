@@ -127,7 +127,8 @@ jobs:
         ls -lah .
         cd dist/
         ls -lah .
-
+    - name: Git pull
+      run: git pull
     - name: Commit & Push Artifacts to Repo
       uses: stefanzweifel/git-auto-commit-action@v4
       with:
