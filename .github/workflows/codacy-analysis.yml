@@ -15,7 +15,7 @@ jobs:
         uses: actions/checkout@main
       - name: Remove old codacy report
         run: |
-          git rm ./reports/codacy-issues.sarif
+          git rm --ignore-unmatch ${{github.workspace }}/reports/codacy-issues.sarif
       - name: Run Codacy Analysis CLI
         uses: codacy/codacy-analysis-cli-action@master
         with:

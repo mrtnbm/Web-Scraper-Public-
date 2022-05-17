@@ -7,8 +7,8 @@ jobs:
       - uses: actions/checkout@master
       - name: Remove old snyk report
         run: |
-          git rm ./reports/snyk-issues.sarif
-          git rm ./reports/snyk.json
+          git rm --ignore-unmatch ${{ github.workspace }}/reports/snyk-issues.sarif
+          git rm --ignore-unmatch ${{ github.workspace }}/reports/snyk.json
       - name: Run Snyk to check for vulnerabilities
         uses: snyk/actions/python@master
         continue-on-error: true # To make sure that SARIF upload gets called
