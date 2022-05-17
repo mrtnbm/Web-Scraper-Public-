@@ -108,7 +108,7 @@ jobs:
         # api-token: ${{ secrets.CODACY_API_TOKEN }}
         if: runner.os == Linux
         coverage-reports: ./reports/coverage.xml
-        if runner.os == Windows
+        if: runner.os == Windows
         coverage-reports: .\reports\coverage.xml
 
     - name: CycloneDX Python Generate SBOM
