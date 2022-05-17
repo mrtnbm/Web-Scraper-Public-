@@ -17,7 +17,7 @@ jobs:
         with:
           args: --sarif-file-output=reports/snyk-issues.sarif --json-file-output=reports/snyk-issues.json
       - name: Upload result to GitHub Code Scanning
-        uses: github/codeql-action/upload-sarif@v1
+        uses: github/codeql-action/upload-sarif@v2
         with:
           sarif_file: reports/snyk-issues.sarif
 
