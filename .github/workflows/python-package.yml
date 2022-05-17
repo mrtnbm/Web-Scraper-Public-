@@ -98,7 +98,9 @@ jobs:
         coverage-reports: ./reports/coverage.xml
 
     - name: CycloneDX Python Generate SBOM
-      run: cyclonedx-bom -r -i requirements-frozen.txt --format json --schema-version 1.4 -o ./reports/sbom-report.json
+      run: |
+        git rm ./reports/sbom-report.json
+        cyclonedx-bom -r -i requirements-frozen.txt --format json --schema-version 1.4 -o ./reports/sbom-report.json
 
     - name: Build Artifacts
       run: pyinstaller -wF web_scraper_all.py
