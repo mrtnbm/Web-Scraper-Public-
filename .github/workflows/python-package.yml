@@ -39,34 +39,26 @@ jobs:
         pip freeze > requirements-frozen.txt
 
     - name: Lint with flake8
-      if: runner.os == Linux
-      run: flake8 web_scraper_all.py --count --show-source --statistics --output-file=./reports/flake8-issues.txt --exit-zero --max-complexity=10
-      if: runner.os == Windows
-      run: flake8 web_scraper_all.py --count --show-source --statistics --output-file=.\reports\flake8-issues.txt --exit-zero --max-complexity=10
+      run: |
+        # stop the build if there are Python syntax errors or undefined names
+        # flake8 . --count --show-source --statistics
+        # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
+        flake8 web_scraper_all.py --count --show-source --statistics --output-file=./reports/flake8-issues.txt --exit-zero --max-complexity=10
 
     - name: Test for security vulnerabilities with bandit
-      if: runner.os == Linux
-      run: bandit web_scraper_all.py -f json -o reports/bandit-issues.json -v --exit-zero
-      if: runner.os == Windows
-      run: bandit web_scraper_all.py -f json -o reports\bandit-issues.json -v --exit-zero
+      run: |
+        bandit web_scraper_all.py -f json -o reports/bandit-issues.json -v --exit-zero
 
     - name: Lint with Pylint
-      if: runner.os == Linux
-      run: pylint web_scraper_all.py --reports=y --output-format=json:./reports/pylint-issues.json,colorized --exit-zero
-      if: runner.os == Windows
-      run: pylint web_scraper_all.py --reports=y --output-format=json:.\reports\pylint-issues.json,colorized --exit-zero
+      run: |
+        pylint web_scraper_all.py --reports=y --output-format=json:./reports/pylint-issues.json,colorized --exit-zero
 
     - name: Test with pytest
-      if: runner.os == Linux
-      run: coverage run -m pytest && coverage xml -o ./reports/coverage.xml
-      if: runner.os == Windows
-      run: coverage run -m pytest && coverage xml -o .\reports\coverage.xml
-        
+      run: |
+        coverage run -m pytest && coverage xml -o ./reports/coverage.xml
+
     - name: Generate docs
-      if: runner.os == Linux
       run: pdoc ./web_scraper_all.py -o ./docs
-      if: runner.os == Windows
-      run: pdoc ./web_scraper_all.py -o .\docs
 
     - name: SonarCloud Scan
       # You may pin to the exact commit or the version.
@@ -85,10 +77,7 @@ jobs:
       with:
         output: codacy-issues.sarif
         format: sarif
-        if: runner.os == Linux
         directory: ${GITHUB_WORKSPACE}/web_scraper_all.py
-        if: runner.os == Windows
-        directory: ${GITHUB_WORKSPACE}\web_scraper_all.py
         # Adjust severity of non-security issues
         gh-code-scanning-compat: true
         # Force 0 exit code to allow SARIF file generation
@@ -106,16 +95,10 @@ jobs:
         project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
         # or
         # api-token: ${{ secrets.CODACY_API_TOKEN }}
-        if: runner.os == Linux
         coverage-reports: ./reports/coverage.xml
-        if: runner.os == Windows
-        coverage-reports: .\reports\coverage.xml
 
     - name: CycloneDX Python Generate SBOM
-      if: runner.os == Linux
       run: cyclonedx-bom -r -i requirements-frozen.txt --format json --schema-version 1.4 -o ./reports/sbom-report.json
-      if: runner.os == Windows
-      run: cyclonedx-bom -r -i requirements-frozen.txt --format json --schema-version 1.4 -o .\reports\sbom-report.json
 
     - name: Build Artifacts
       run: pyinstaller -wF web_scraper_all.py
@@ -124,7 +107,7 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: web-scraper-docs
-        path: ${{ github.workspace }}/docs/*
+        path: docs/*
         if-no-files-found: error
 
     - name: Archive Artifacts - SBOM, Coverage, Linting
@@ -132,7 +115,7 @@ jobs:
       with:
         name: web-scraper-reports
         path: | 
-          ${{ github.workspace }}/reports/*
+          reports/*
         if-no-files-found: error
 
     - name: Archive Artifacts - Executables
@@ -140,7 +123,7 @@ jobs:
       with:
         name: web-scraper-executable
         path: | 
-          ${{ github.workspace }}/dist/*
+          dist/*
         if-no-files-found: error
 
     #- name: Dependency Track Upload SBOM for Vulnerability Analysis and Visualization
@@ -154,17 +137,11 @@ jobs:
     #    autocreate: 'true'
     #    bomfilename: 'sbom-report.json'
 
-    - name: Debug
-      if: runner.os == Linux
+    - name: debug
       run: |
         ls -lah .
         cd dist/
         ls -lah .
-      if: runner.os == Windows
-      run: |
-        dir
-        cd dist\
-        dir
 
     - name: Commit & Push Artifacts to Repo
       uses: stefanzweifel/git-auto-commit-action@v4
@@ -178,4 +155,4 @@ jobs:
         # See the `pathspec`-documentation for git
         # - https://git-scm.com/docs/git-add#Documentation/git-add.txt-ltpathspecgt82308203
         # - https://git-scm.com/docs/gitglossary#Documentation/gitglossary.txt-aiddefpathspecapathspec
-        file_pattern: ${{ github.workspace }}/docs/* ${{ github.workspace }}/dist/* ${{ github.workspace }}/reports/*
+        file_pattern: docs/* dist/* reports/*
