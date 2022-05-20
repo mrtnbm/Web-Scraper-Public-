@@ -25,7 +25,7 @@ jobs:
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
-          args: --file=requirements-frozen.txt --sarif-file-output=reports/snyk-issues.sarif --json-file-output=reports/snyk-issues.json
+          args: --file=requirements-frozen.txt --package-manager=pip --sarif-file-output=reports/snyk-issues.sarif --json-file-output=reports/snyk-issues.json
       - name: Upload result to GitHub Code Scanning
         uses: github/codeql-action/upload-sarif@v2
         with:
@@ -34,7 +34,7 @@ jobs:
       - name: Git Pull
         run: git pull
       - run: |
-          if [[ $(git update-index --refresh && git diff-index --quiet HEAD --)]]; then
+          if [ $(git update-index --refresh && git diff-index --quiet HEAD --)]; then
             echo "IS_FILE_CHANGED=true" >> $GITHUB_ENV
           else
             echo "IS_FILE_CHANGED=false" >> $GITHUB_ENV
