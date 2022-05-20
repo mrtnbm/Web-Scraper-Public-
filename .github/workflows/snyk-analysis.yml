@@ -19,6 +19,7 @@ jobs:
           python -m pip install flake8 pytest cyclonedx-bom pyinstaller pdoc bandit pylint coverage
           pip install -r requirements.txt
           pip freeze > requirements-frozen.txt
+          pip install -r requirements-frozen.txt
       - name: Run Snyk to check for vulnerabilities
         uses: snyk/actions/python@master
         continue-on-error: true # To make sure that SARIF upload gets called
