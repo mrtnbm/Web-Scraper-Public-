@@ -96,6 +96,6 @@
   "filesystemPolicy": false,
   "uniqueCount": 0,
   "projectName": "workspace",
-  "displayTargetFile": "requirements.txt",
+  "displayTargetFile": "requirements-frozen.txt",
   "path": "/github/workspace"
 }
