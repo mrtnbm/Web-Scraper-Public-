@@ -884,19 +884,6 @@
         "message-id": "C0301"
     },
     {
-        "type": "convention",
-        "module": "web_scraper_all",
-        "obj": "",
-        "line": 1,
-        "column": 0,
-        "endLine": null,
-        "endColumn": null,
-        "path": "web_scraper_all.py",
-        "symbol": "missing-module-docstring",
-        "message": "Missing module docstring",
-        "message-id": "C0114"
-    },
-    {
         "type": "warning",
         "module": "web_scraper_all",
         "obj": "",
@@ -908,6 +895,19 @@
         "symbol": "redefined-builtin",
         "message": "Redefining built-in 'print'",
         "message-id": "W0622"
+    },
+    {
+        "type": "convention",
+        "module": "web_scraper_all",
+        "obj": "",
+        "line": 1,
+        "column": 0,
+        "endLine": null,
+        "endColumn": null,
+        "path": "web_scraper_all.py",
+        "symbol": "missing-module-docstring",
+        "message": "Missing module docstring",
+        "message-id": "C0114"
     },
     {
         "type": "convention",
