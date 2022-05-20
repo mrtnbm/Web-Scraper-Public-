@@ -41,7 +41,7 @@ jobs:
         with:
           # Optional. Commit message for the created commit.
           # Defaults to "Apply automatic changes"
-          commit_message: ${{ github.workflow }}${{ github.job }}-${{ github.run_number }} Commit & Push Artifacts
+          commit_message: ${{ github.workflow }}, ${{ github.job }}-${{ github.run_number }} Commit & Push Artifacts
 
           # Optional glob pattern of files which should be added to the commit
           # Defaults to all (.)
