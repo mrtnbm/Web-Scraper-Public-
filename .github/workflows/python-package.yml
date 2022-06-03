@@ -3,8 +3,7 @@
 
 name: Python CI/CD
 
-on: 
-  push:
+on: push
   # schedule:
   #   # every day at 6am
   #   - cron: '0 6 * * *'
