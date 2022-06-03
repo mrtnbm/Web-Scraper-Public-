@@ -32,13 +32,13 @@ jobs:
       - name: Git Pull & refresh index
         run: git pull && git update-index --refresh
       - run: |
-          if ! git diff-index --quiet HEAD --; then
+          if git diff-index --quiet HEAD --; then
             echo "IS_FILE_CHANGED=true" >> $GITHUB_ENV
           else
             echo "IS_FILE_CHANGED=false" >> $GITHUB_ENV
           fi
-          echo ${{ env.IS_FILE_CHANGED }}
-          echo $(git diff-index --quiet HEAD --)
+          echo $IS_FILE_CHANGED
+          echo "$(git diff-index --quiet HEAD --)"
       - if: ${{ env.IS_FILE_CHANGED }}
         name: Commit & Push Artifacts to Repo
         uses: stefanzweifel/git-auto-commit-action@v4
