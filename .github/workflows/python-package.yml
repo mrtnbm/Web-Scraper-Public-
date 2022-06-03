@@ -128,7 +128,7 @@ jobs:
         cd dist/
         ls -lah .
     - name: Git Pull & refresh index
-      run: git pull && git update-index --refresh
+      run: git pull
     - run: |
           if git diff-index --quiet HEAD --; then
             echo "IS_FILE_CHANGED=true" >> $GITHUB_ENV
