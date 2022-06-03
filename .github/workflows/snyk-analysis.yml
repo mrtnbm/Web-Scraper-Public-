@@ -32,7 +32,7 @@ jobs:
           sarif_file: reports/snyk-issues.sarif
 
       - name: remove req-frozen.txt
-        run: git rm --ignore-unmatch requirements-frozen.txt
+        run: git rm --ignore-unmatch requirements-frozen.txt && rm -f requirements-frozen.txt
       - name: Git Pull
         run: git pull
       - run: |
