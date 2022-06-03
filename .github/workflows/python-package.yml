@@ -123,6 +123,7 @@ jobs:
 
     - name: debug
       run: |
+        git status
         ls -lah .
         cd dist/
         ls -lah .
