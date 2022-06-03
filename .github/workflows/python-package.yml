@@ -126,15 +126,15 @@ jobs:
         ls -lah .
         cd dist/
         ls -lah .
-    - name: Git pull
-      run: git pull
+    - name: Git Pull & refresh index
+      run: git pull && git update-index --refresh
     - run: |
           if git diff-index --quiet HEAD --; then
             echo "IS_FILE_CHANGED=true" >> $GITHUB_ENV
           else
             echo "IS_FILE_CHANGED=false" >> $GITHUB_ENV
           fi
-      - if: ${{ env.IS_FILE_CHANGED == true}}
+    - if: ${{ env.IS_FILE_CHANGED == true}}
       name: Commit & Push Artifacts to Repo
       uses: stefanzweifel/git-auto-commit-action@v4
       with:
