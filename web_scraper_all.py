@@ -1,5 +1,6 @@
 import logging
 import os
+import pathlib
 import random
 import sys
 import time
@@ -169,39 +170,43 @@ def create_main_window():
             toggle_sec1 = not toggle_sec1
             window['hidden_sec'].update(visible=toggle_sec1)
         if event == "OK":
+            try:
+                int(values[0])
+                int(values[1])
+                int(values[2])
+                path = pathlib.Path(values[3])
+                if not (path.is_dir() and path.exists()):
+                    logging.error("Path is not a directory or does not exist.")
+                    create_pop_up_window(mode="path")
+                    continue
+            except ValueError as eval:
+                logging.error("Values 0-2 contains non integer values.: %s", eval)
+                create_pop_up_window()
+                continue
             window.close()
-            while True:
-                try:
-                    int(values[0])
-                    int(values[1])
-                    int(values[2])
-                except ValueError as eval:
-                    logging.error("Values contains non integer values.: %s", eval)
-                    sg.theme('Dark Gray 13')
-                    alt_values = sg.popup_get_text(
-                        "Error: Values contains non integer values. Please enter integer values:", default_text="1,2,1",
-                        no_titlebar=False, keep_on_top=True, grab_anywhere=True)
-                    if (values[0] or values[1] or values[2] or (
-                            not is_alllang and values["inputtxt"])) is None or "" or alt_values is None:
-                        sg.SystemTray.notify("Cancelled", "Closing program...", display_duration_in_ms=750,
-                                             fade_in_duration=100, icon=ICON_CANCEL)
-                        sys.exit(1)
+            break
+    return event, values
 
-                    try:
-                        alt_values_split = alt_values.split(",")
-                        values[0] = alt_values_split[0]
-                        values[1] = alt_values_split[1]
-                        values[2] = alt_values_split[2]
-                    except IndexError as erri:
-                        sg.SystemTray.notify("Too many retries", "Closing program...", display_duration_in_ms=750,
-                                             fade_in_duration=100, icon=ICON_WARNING)
-                        logging.error("Index error: %s", erri)
-                        sys.exit(1)
-                else:
-                    break
-
-            return event, values
-
+def create_pop_up_window(mode=""):
+    """
+    Creates a pop-up window in case the user has entered non integer values in the text fields for the number intervalls and steps or an invalid path for saving the csv file.
+    :return: None
+    """
+    if mode == "path":
+        text = "Please enter a valid path to a directory!"
+    else:
+        text = "Please enter only integer values in the text fields!"
+    sg.theme('Dark Gray 13')
+    layout_col = [[sg.Text(text, font=("Helvetica", "10", "bold"), text_color="red", justification="center")],
+              [sg.Button("OK", font=("Helvetica", "10", "bold"), border_width=0)]]
+    layout = [[sg.Column(layout_col, element_justification="center")]]
+    window = sg.Window('Error', layout, finalize=True, resizable=True, auto_size_text=True,
+                       auto_size_buttons=True, no_titlebar=True, grab_anywhere=True, keep_on_top=True)
+    while True:
+        event, values = window.read()
+        if event in (sg.WIN_CLOSED, 'OK'):
+            window.close()
+            break
 
 def progress_bar_meter(counter):
     """
@@ -233,36 +238,26 @@ if __name__ == '__main__':
 
     start_time = time.time()  # log execution time of script
 
-    while True:
-        if retries > MAX_RETRIES_REQ:
-            sg.SystemTray.notify("Too many retries", "Closing program...", display_duration_in_ms=750,
-                                 fade_in_duration=100, icon=ICON_WARNING)
-            logging.info('Reached max retries, closing program.')
-            sys.exit(1)
+    while retries < MAX_RETRIES_REQ:
         try:
             # 3.05 because of TCP retransmission windows https://2.python-requests.org/en/master/user/advanced/#timeouts
             page = requests.get('https://www.languagesandnumbers.com/site-map/en/', headers=HEADERS,
                                 timeout=REQ_TIMEOUT)
             page.raise_for_status()  # raises error if status code is between 400-600
-        except requests.exceptions.HTTPError as errh:  # handling server error codes
-            logging.error('1 HTTPError: %s', errh)
+        except (requests.exceptions.HTTPError, requests.exceptions.ConnectionError, requests.exceptions.Timeout,
+        requests.exceptions.RequestException) as e:
+            logging.error('1 Error: %s', e)
             logging.info("Trying again...")
             retries += 1
-        except requests.exceptions.ConnectionError as errc:
-            logging.error('1 ConnectionError: %s', errc)
-            logging.info("Trying again...")
-            retries += 1
-            time.sleep(3)  # replugging ethernet cable is slow
-        except requests.exceptions.Timeout as errt:
-            logging.error('1 TimeoutError: %s', errt)
-            logging.info("Trying again...")
-            retries += 1
-        except requests.exceptions.RequestException as err:  # safety-net for any unspecified exception
-            logging.error('1 UnspecifiedError: %s', err)
-            logging.info("Trying again...")
-            retries += 1
+            if isinstance(e, requests.exceptions.ConnectionError):
+                time.sleep(3)  # replugging ethernet cable is slow
         else:
             break
+    else:
+        sg.SystemTray.notify("Too many retries", "Closing program...", display_duration_in_ms=750,
+                                 fade_in_duration=100, icon=ICON_WARNING)
+        logging.info('Reached max retries, closing program.')
+        sys.exit(1)
 
     main_link = 'https://www.languagesandnumbers.com/'
 
@@ -290,12 +285,11 @@ if __name__ == '__main__':
                 str(lang), str(find_lang_long(link)))
             # lst_of_words = lst_of_words + find_lang_long(link) + ";" + '-1' + ";" + "Language not supported.\n"
             continue
-        if selected_lang == "":
-            if not progress_bar_meter(count):
-                logging.info('Process cancelled by clicking cancel button for link %s.', str(link))
-                sg.SystemTray.notify("Cancelled", "Closing program...", display_duration_in_ms=750, fade_in_duration=50,
+        if selected_lang == "" and not progress_bar_meter(count):
+            logging.info('Process cancelled by clicking cancel button for link %s.', str(link))
+            sg.SystemTray.notify("Cancelled", "Closing program...", display_duration_in_ms=750, fade_in_duration=50,
                                      icon=ICON_CANCEL)
-                sys.exit(1)
+            sys.exit(1)
 
         for i in range(start, end, step):
             # POST method is not working on the ajax server with numbers > 12
@@ -303,23 +297,16 @@ if __name__ == '__main__':
                 logging.warning("POSTING HTTP to ajax server is not supported for %s with values larger than 12.",
                                 str(lang))
                 continue
-            if not selected_lang == "":
-                if not progress_bar_meter(count_inner):
-                    logging.info('Progress cancelled (inner) for i=%s and link=%s', str(i), str(link))
-                    sg.SystemTray.notify("Cancelled", "Closing program...", display_duration_in_ms=750,
+            if selected_lang != "" and not progress_bar_meter(count_inner):
+                logging.info('Progress cancelled (inner) for i=%s and link=%s', str(i), str(link))
+                sg.SystemTray.notify("Cancelled", "Closing program...", display_duration_in_ms=750,
                                          fade_in_duration=100, icon=ICON_CANCEL)
-                    sys.exit(1)
+                sys.exit(1)
             # requests.Session uses single TCP-connection for sending/receiving HTTP multi reqs/resps
             # saves time over opening a new connection for every single req/resp pair, see
             # https://en.wikipedia.org/wiki/HTTP_persistent_connection
             with requests.Session() as session:
-                while True:
-                    if retries > MAX_RETRIES_REQ:
-                        logging.info('Too many retries while trying to post query i=%s and link=%s', str(i),
-                                     str(link))
-                        sg.SystemTray.notify("Too many retries", "Closing program...", display_duration_in_ms=750,
-                                             fade_in_duration=100, icon=ICON_WARNING)
-                        sys.exit(1)
+                while retries < MAX_RETRIES_REQ:
                     try:
                         # post to server with params for language and number and extract response
                         response = session.post('https://www.languagesandnumbers.com/ajax/en', headers=HEADERS,
@@ -331,25 +318,24 @@ if __name__ == '__main__':
                         time.sleep(random.uniform(1, 3))  # sleep between 1 and 3 seconds to avoid server timeouts
 
                         response.raise_for_status()
-                    except requests.exceptions.HTTPError as errh:
-                        logging.error("HTTPError while retrieving response of %s: %s", str(lang), errh)
+                    except (requests.exceptions.HTTPError, requests.exceptions.ConnectionError, requests.exceptions.Timeout) as err:
+                        logging.error("Error while retrieving response of %s: %s", str(lang), err)
                         logging.info("Trying again...")
                         retries += 1
-                    except requests.exceptions.ConnectionError as errc:
-                        logging.error("ConnectionError while retrieving response of %s: %s", str(lang), errc)
-                        logging.info("Trying again...")
-                        retries += 1
-                        time.sleep(3)  # replugging ethernet cable is slow
-                    except requests.exceptions.Timeout as errt:
-                        logging.error("TimeOutError while retrieving response of %s: %s", str(lang), errt)
-                        logging.info("Trying again...")
-                        retries += 1
+                        if isinstance(err, requests.exceptions.ConnectionError):
+                            time.sleep(3)  # replugging ethernet cable is slow
                     except requests.exceptions.RequestException as err:
                         logging.error("UnspecifiedError while retrieving response of %s: %s", str(lang), err)
                         logging.info("Trying again...")
                         retries += 1
                     else:
                         break
+                else:
+                    logging.info('Too many retries while trying to post query i=%s and link=%s', str(i),
+                                     str(link))
+                    sg.SystemTray.notify("Too many retries", "Closing program...", display_duration_in_ms=750,
+                                             fade_in_duration=100, icon=ICON_WARNING)
+                    sys.exit(1)
 
                 # parse response
                 soup = BeautifulSoup(response.content, "lxml", from_encoding="utf-8")
@@ -370,17 +356,12 @@ if __name__ == '__main__':
         count += 1
     alt_path = ""
     retries = 0
-    while True:
+    while retries < MAX_RETRIES_REQ:
         try:
             if retries >= 1:
                 write_csv(lst_of_words, alt_path)
             elif retries == 0:
                 write_csv(lst_of_words, file_path)
-            elif retries > MAX_RETRIES_REQ:
-                logging.warning("Max retries reached while trying to write .csv file, closing program.")
-                sg.SystemTray.notify("Max retries reached", "Closing program...", display_duration_in_ms=750,
-                                     fade_in_duration=100, icon=ICON_WARNING)
-                sys.exit(1)
         except OSError as erro:
             logging.error("Could not write to file: %s", erro)
 
@@ -397,6 +378,11 @@ if __name__ == '__main__':
                 sys.exit(1)
         else:
             break
+    else:
+        logging.warning("Max retries reached while trying to write .csv file, closing program.")
+        sg.SystemTray.notify("Max retries reached", "Closing program...", display_duration_in_ms=750,
+                                     fade_in_duration=100, icon=ICON_WARNING)
+        sys.exit(1)
 
     seconds = time.time() - start_time
 
