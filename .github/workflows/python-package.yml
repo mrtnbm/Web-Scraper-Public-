@@ -28,7 +28,7 @@ jobs:
 
     - name: Install dependencies
       run: |
-        apt install -y xvfb
+        sudo apt-get install -y xvfb
         python -m pip install --upgrade pip setuptools wheel
         python -m pip install flake8 pytest cyclonedx-bom pyinstaller pdoc bandit pylint coverage
         pip install -r requirements.txt
