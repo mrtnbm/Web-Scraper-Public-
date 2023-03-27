@@ -42,7 +42,7 @@ ICON_WARNING = b'iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAACXBIWXMAAA7EAAA
 print = sg.Print
 
 
-def parse_save_website(website_page, sel_lang=""):
+def parse_save_website(website_page, lst_of_links, sel_lang=""):
     """
     Parses HTML with lxml (faster than html.parser,
     see https://www.crummy.com/software/BeautifulSoup/bs4/doc/#improving-performance) and only saves a tags into a
@@ -69,6 +69,7 @@ def parse_save_website(website_page, sel_lang=""):
         if len(lst_of_links) == 0:
             sg.SystemTray.notify("Language not listed on website", "Closing program...", display_duration_in_ms=750,
                                  fade_in_duration=100, icon=ICON_WARNING)
+            sys.exit(1)
 
 
 def write_csv(string, path):
@@ -102,17 +103,15 @@ def find_lang_long(list_item):
     """
     return list_item.split('how-to-count-in-')[1].split('/', 1)[0].title()
 
-
-def progress_bar(counter):
-    """
-    [Not used, headless mode only]
-    Prints out progress bar in cmd.
-    :param counter: Amount of links already processed
-    :return: String
-    """
-    return print(end="\r" + "░" * 81 + "┃\r┃" + "█" * int(80 * counter / (len(lst_of_links) - 1)) + "%6.2f %%" % (
-            counter / (len(lst_of_links) - 1) * 100))
-
+# def progress_bar(counter):
+#     """
+#     [Not used, headless mode only]
+#     Prints out progress bar in cmd.
+#     :param counter: Amount of links already processed
+#     :return: String
+#     """
+#     return print(end="\r" + "░" * 81 + "┃\r┃" + "█" * int(80 * counter / (len(lst_of_links) - 1)) + "%6.2f %%" % (
+#             counter / (len(lst_of_links) - 1) * 100))
 
 def collapse(layout, key, visible):
     """
@@ -267,7 +266,7 @@ if __name__ == '__main__':
     lst_of_links = []
     lst_of_words = ""
 
-    parse_save_website(page, sel_lang=selected_lang)
+    parse_save_website(page, lst_of_links, sel_lang=selected_lang)
 
     count = 0
     count_inner = 0
