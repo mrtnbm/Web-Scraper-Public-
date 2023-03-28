@@ -121,17 +121,6 @@ def find_lang_long(list_item):
     return list_item.split("how-to-count-in-")[1].split("/", 1)[0].title()
 
 
-# def progress_bar(counter):
-#     """
-#     [Not used, headless mode only]
-#     Prints out progress bar in cmd.
-#     :param counter: Amount of links already processed
-#     :return: String
-#     """
-#     return print(end="\r" + "░" * 81 + "┃\r┃" + "█" * int(80 * counter / (len(lst_of_links) - 1)) + "%6.2f %%" % (
-#             counter / (len(lst_of_links) - 1) * 100))
-
-
 def collapse(layout, key, visible):
     """
     See https://stackoverflow.com/a/63471167
@@ -384,7 +373,7 @@ if __name__ == "__main__":
     retries = 0
 
     for link in lst_of_links:
-        page = requests.get(main_link + link, headers=HEADERS)
+        page = requests.get(main_link + link, headers=HEADERS, timeout=REQ_TIMEOUT)
         soup = BeautifulSoup(page.content, features="lxml", parse_only=SoupStrainer(id="number-form"))
         form = soup.find_all(id="number-form")
 
