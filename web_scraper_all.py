@@ -83,7 +83,7 @@ def parse_save_website(website_page, lst_of_links, sel_lang="") -> None:
         if len(lst_of_links) == 0:
             sg.SystemTray.notify(
                 "Language not listed on website",
-                TXT_CLOSE,
+                STR_ST_CLOSE,
                 display_duration_in_ms=750,
                 fade_in_duration=100,
                 icon=ICON_WARNING,
@@ -295,10 +295,10 @@ def progress_bar_meter(counter):
 
     if selected_lang == "":
         return sg.one_line_progress_meter(
-            TXT_PROGRESS,
+            STR_ST_PROGR,
             counter + 1,
             len(lst_of_links),
-            TXT_PROGRESS,
+            STR_ST_PROGR,
             orientation="h",
             no_titlebar=False,
             grab_anywhere=True,
@@ -306,10 +306,10 @@ def progress_bar_meter(counter):
         )
     else:
         return sg.one_line_progress_meter(
-            TXT_PROGRESS,
+            STR_ST_PROGR,
             counter + 1,
             len(range(start, end, step)),
-            TXT_PROGRESS,
+            STR_ST_PROGR,
             orientation="h",
             no_titlebar=False,
             grab_anywhere=True,
@@ -343,7 +343,7 @@ if __name__ == "__main__":
             requests.exceptions.RequestException,
         ) as e:
             logging.error("1 Error: %s", e)
-            logging.info(TXT_RETRY)
+            logging.info(STR_ST_RETRY)
             retries += 1
             if isinstance(e, requests.exceptions.ConnectionError):
                 time.sleep(3)  # replugging ethernet cable is slow
@@ -352,7 +352,7 @@ if __name__ == "__main__":
     else:
         sg.SystemTray.notify(
             "Too many retries",
-            TXT_CLOSE,
+            STR_ST_CLOSE,
             display_duration_in_ms=750,
             fade_in_duration=100,
             icon=ICON_WARNING,
@@ -392,7 +392,7 @@ if __name__ == "__main__":
         if selected_lang == "" and not progress_bar_meter(count):
             logging.info("Process cancelled by clicking cancel button for link %s.", str(link))
             sg.SystemTray.notify(
-                "Cancelled", TXT_CLOSE, display_duration_in_ms=750, fade_in_duration=50, icon=ICON_CANCEL
+                "Cancelled", STR_ST_CLOSE, display_duration_in_ms=750, fade_in_duration=50, icon=ICON_CANCEL
             )
             sys.exit(1)
 
@@ -407,7 +407,7 @@ if __name__ == "__main__":
                 logging.info("Progress cancelled (inner) for i=%s and link=%s", str(i), str(link))
                 sg.SystemTray.notify(
                     "Cancelled",
-                    TXT_CLOSE,
+                    STR_ST_CLOSE,
                     display_duration_in_ms=750,
                     fade_in_duration=100,
                     icon=ICON_CANCEL,
@@ -443,13 +443,13 @@ if __name__ == "__main__":
                         requests.exceptions.Timeout,
                     ) as err:
                         logging.error("Error while retrieving response of %s: %s", str(lang), err)
-                        logging.info(TXT_RETRY)
+                        logging.info(STR_ST_RETRY)
                         retries += 1
                         if isinstance(err, requests.exceptions.ConnectionError):
                             time.sleep(3)  # replugging ethernet cable is slow
                     except requests.exceptions.RequestException as err:
                         logging.error("UnspecifiedError while retrieving response of %s: %s", str(lang), err)
-                        logging.info(TXT_RETRY)
+                        logging.info(STR_ST_RETRY)
                         retries += 1
                     else:
                         break
@@ -457,7 +457,7 @@ if __name__ == "__main__":
                     logging.info("Too many retries while trying to post query i=%s and link=%s", str(i), str(link))
                     sg.SystemTray.notify(
                         "Too many retries",
-                        TXT_CLOSE,
+                        STR_ST_CLOSE,
                         display_duration_in_ms=750,
                         fade_in_duration=100,
                         icon=ICON_WARNING,
@@ -504,14 +504,14 @@ if __name__ == "__main__":
             alt_path = sg.popup_get_folder(
                 "Error: Please enter a different folder name", no_titlebar=False, grab_anywhere=True, keep_on_top=True
             )
-            logging.info(TXT_RETRY)
+            logging.info(STR_ST_RETRY)
             retries += 1
 
             if alt_path is None or "":
                 logging.info("Cancelled operation, closing program.")
                 sg.SystemTray.notify(
                     "Cancelled",
-                    TXT_CLOSE,
+                    STR_ST_CLOSE,
                     display_duration_in_ms=750,
                     fade_in_duration=100,
                     icon=ICON_CANCEL,
@@ -523,7 +523,7 @@ if __name__ == "__main__":
         logging.warning("Max retries reached while trying to write .csv file, closing program.")
         sg.SystemTray.notify(
             "Max retries reached",
-            TXT_CLOSE,
+            STR_ST_CLOSE,
             display_duration_in_ms=750,
             fade_in_duration=100,
             icon=ICON_WARNING,
