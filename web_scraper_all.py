@@ -45,10 +45,13 @@ ICON_WARNING = (
     b"InqDqcTS/m+qpqJYa9pDMBrcDr5VIP4S3ErJOmv1QpOQ3YrGO6k4RY3Y6OZ1xe/5Ap7hYcbXlLh/AHcmXTfceSpqAAAAAElFTkSu"
     b"QmCC "
 )
+
 THEME_STYLE = "Dark Gray 13"
-TXT_PROGRESS = "Scraping numerals..."
-TXT_CLOSE = "Closing program..."
-TXT_RETRY = "Trying again..."
+
+# System tray notification texts
+STR_ST_PROGR = "Scraping numerals..."
+STR_ST_CLOSE = "Closing program..."
+STR_ST_RETRY = "Trying again..."
 
 print = sg.Print
 
