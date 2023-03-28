@@ -45,6 +45,10 @@ ICON_WARNING = (
     b"InqDqcTS/m+qpqJYa9pDMBrcDr5VIP4S3ErJOmv1QpOQ3YrGO6k4RY3Y6OZ1xe/5Ap7hYcbXlLh/AHcmXTfceSpqAAAAAElFTkSu"
     b"QmCC "
 )
+THEME_STYLE = "Dark Gray 13"
+TXT_PROGRESS = "Scraping numerals..."
+TXT_CLOSE = "Closing program..."
+TXT_RETRY = "Trying again..."
 
 print = sg.Print
 
@@ -76,7 +80,7 @@ def parse_save_website(website_page, lst_of_links, sel_lang="") -> None:
         if len(lst_of_links) == 0:
             sg.SystemTray.notify(
                 "Language not listed on website",
-                "Closing program...",
+                TXT_CLOSE,
                 display_duration_in_ms=750,
                 fade_in_duration=100,
                 icon=ICON_WARNING,
@@ -136,7 +140,7 @@ def collapse(layout, key, visible):
     all sections created using PySimpleGUI are visible. However, this function allows the user to create a section that
     is initially hidden and can be made visible later by setting the visible attribute of the section to True.
 
-    The pin method is used to ensure that the column is not resized or moved by the user when it is visible. This 
+    The pin method is used to ensure that the column is not resized or moved by the user when it is visible. This
     ensures that the collapsed section always occupies the same space in the layout, whether it is visible or not.
     :param layout: The layout for the section
     :param key: Key used to make this section visible / invisible
@@ -154,7 +158,7 @@ def create_main_window():
     :return: (event, values) User input from the text fields and the fired events (events).
     """
 
-    sg.theme("Dark Gray 13")
+    sg.theme(THEME_STYLE)
 
     hidden_sec = [
         [sg.Text("Specific language that should be scraped:", border_width=0)],
@@ -264,7 +268,7 @@ def create_pop_up_window(mode=""):
         text = "Please enter a valid path to a directory!"
     else:
         text = "Please enter only integer values in the text fields!"
-    sg.theme("Dark Gray 13")
+    sg.theme(THEME_STYLE)
     layout_col = [
         [sg.Text(text, font=("Helvetica", "10", "bold"), text_color="red", justification="center")],
         [sg.Button("OK", font=("Helvetica", "10", "bold"), border_width=0)],
@@ -295,14 +299,14 @@ def progress_bar_meter(counter):
     :param counter: The current iteration in the loop
     :return: True/False
     """
-    sg.theme("Dark Gray 13")
+    sg.theme(THEME_STYLE)
 
     if selected_lang == "":
         return sg.one_line_progress_meter(
-            "Scraping numerals...",
+            TXT_PROGRESS,
             counter + 1,
             len(lst_of_links),
-            "Scraping numerals...",
+            TXT_PROGRESS,
             orientation="h",
             no_titlebar=False,
             grab_anywhere=True,
@@ -310,10 +314,10 @@ def progress_bar_meter(counter):
         )
     else:
         return sg.one_line_progress_meter(
-            "Scraping numerals...",
+            TXT_PROGRESS,
             counter + 1,
             len(range(start, end, step)),
-            "Scraping numerals...",
+            TXT_PROGRESS,
             orientation="h",
             no_titlebar=False,
             grab_anywhere=True,
@@ -347,7 +351,7 @@ if __name__ == "__main__":
             requests.exceptions.RequestException,
         ) as e:
             logging.error("1 Error: %s", e)
-            logging.info("Trying again...")
+            logging.info(TXT_RETRY)
             retries += 1
             if isinstance(e, requests.exceptions.ConnectionError):
                 time.sleep(3)  # replugging ethernet cable is slow
@@ -356,7 +360,7 @@ if __name__ == "__main__":
     else:
         sg.SystemTray.notify(
             "Too many retries",
-            "Closing program...",
+            TXT_CLOSE,
             display_duration_in_ms=750,
             fade_in_duration=100,
             icon=ICON_WARNING,
@@ -396,7 +400,7 @@ if __name__ == "__main__":
         if selected_lang == "" and not progress_bar_meter(count):
             logging.info("Process cancelled by clicking cancel button for link %s.", str(link))
             sg.SystemTray.notify(
-                "Cancelled", "Closing program...", display_duration_in_ms=750, fade_in_duration=50, icon=ICON_CANCEL
+                "Cancelled", TXT_CLOSE, display_duration_in_ms=750, fade_in_duration=50, icon=ICON_CANCEL
             )
             sys.exit(1)
 
@@ -411,7 +415,7 @@ if __name__ == "__main__":
                 logging.info("Progress cancelled (inner) for i=%s and link=%s", str(i), str(link))
                 sg.SystemTray.notify(
                     "Cancelled",
-                    "Closing program...",
+                    TXT_CLOSE,
                     display_duration_in_ms=750,
                     fade_in_duration=100,
                     icon=ICON_CANCEL,
@@ -447,13 +451,13 @@ if __name__ == "__main__":
                         requests.exceptions.Timeout,
                     ) as err:
                         logging.error("Error while retrieving response of %s: %s", str(lang), err)
-                        logging.info("Trying again...")
+                        logging.info(TXT_RETRY)
                         retries += 1
                         if isinstance(err, requests.exceptions.ConnectionError):
                             time.sleep(3)  # replugging ethernet cable is slow
                     except requests.exceptions.RequestException as err:
                         logging.error("UnspecifiedError while retrieving response of %s: %s", str(lang), err)
-                        logging.info("Trying again...")
+                        logging.info(TXT_RETRY)
                         retries += 1
                     else:
                         break
@@ -461,7 +465,7 @@ if __name__ == "__main__":
                     logging.info("Too many retries while trying to post query i=%s and link=%s", str(i), str(link))
                     sg.SystemTray.notify(
                         "Too many retries",
-                        "Closing program...",
+                        TXT_CLOSE,
                         display_duration_in_ms=750,
                         fade_in_duration=100,
                         icon=ICON_WARNING,
@@ -504,18 +508,18 @@ if __name__ == "__main__":
         except OSError as erro:
             logging.error("Could not write to file: %s", erro)
 
-            sg.theme("Dark Gray 13")
+            sg.theme(THEME_STYLE)
             alt_path = sg.popup_get_folder(
                 "Error: Please enter a different folder name", no_titlebar=False, grab_anywhere=True, keep_on_top=True
             )
-            logging.info("Trying again...")
+            logging.info(TXT_RETRY)
             retries += 1
 
             if alt_path is None or "":
                 logging.info("Cancelled operation, closing program.")
                 sg.SystemTray.notify(
                     "Cancelled",
-                    "Closing program...",
+                    TXT_CLOSE,
                     display_duration_in_ms=750,
                     fade_in_duration=100,
                     icon=ICON_CANCEL,
@@ -527,7 +531,7 @@ if __name__ == "__main__":
         logging.warning("Max retries reached while trying to write .csv file, closing program.")
         sg.SystemTray.notify(
             "Max retries reached",
-            "Closing program...",
+            TXT_CLOSE,
             display_duration_in_ms=750,
             fade_in_duration=100,
             icon=ICON_WARNING,
