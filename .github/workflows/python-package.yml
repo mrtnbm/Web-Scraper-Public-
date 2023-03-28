@@ -136,7 +136,7 @@ jobs:
           else
             echo "IS_FILE_CHANGED=false" >> $GITHUB_ENV
           fi
-    - if: ${{ env.IS_FILE_CHANGED == true}}
+    - if: ${{ env.IS_FILE_CHANGED == true }}
       name: Commit & Push Artifacts to Repo
       uses: stefanzweifel/git-auto-commit-action@v4
       with:
