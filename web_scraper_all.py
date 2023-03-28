@@ -10,15 +10,16 @@ import PySimpleGUI as sg  # code convention, see PySimpleGUI docs
 import requests
 from bs4 import BeautifulSoup, SoupStrainer
 
-now = datetime.now()
-dt_string = now.strftime("%d%m%Y-%H%M%S")
+now: datetime = datetime.now()
+dt_string: str = now.strftime("%d%m%Y-%H%M%S")
 
 logging.basicConfig(filename=dt_string + '.log', encoding='utf-8', level=logging.DEBUG,
                     format='%(asctime)s %(levelname)s %(message)s')
 
-CURRENT_WORKING_DIR = os.path.abspath(os.getcwd())
+CURRENT_WORKING_DIR: str = os.path.abspath(os.getcwd())
 MAX_RETRIES_REQ = 164
-HEADERS = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101 Firefox/78.0'}
+HEADERS: dict[str, str] = {
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101 Firefox/78.0'}
 REQ_TIMEOUT = 3.05
 
 ICON_CANCEL = b'iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAACXBIWXMAAA7EAAAOxAGVKw4bAAACCklEQVRYhb2Xz0obURTGfwkhS' \
@@ -42,7 +43,7 @@ ICON_WARNING = b'iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAACXBIWXMAAA7EAAA
 print = sg.Print
 
 
-def parse_save_website(website_page, lst_of_links, sel_lang=""):
+def parse_save_website(website_page, lst_of_links, sel_lang="") -> None:
     """
     Parses HTML with lxml (faster than html.parser,
     see https://www.crummy.com/software/BeautifulSoup/bs4/doc/#improving-performance) and only saves a tags into a
@@ -72,7 +73,7 @@ def parse_save_website(website_page, lst_of_links, sel_lang=""):
             sys.exit(1)
 
 
-def write_csv(string, path):
+def write_csv(string, path) -> None:
     """
     Writes string to csv file in root directory
     :param path: Desired file-path
@@ -81,12 +82,13 @@ def write_csv(string, path):
     """
     filename = 'dataset.csv'
     full_path = os.path.join(path, filename)
-    with open(full_path, 'w', newline='', encoding='utf-8-sig') as f:  # utf-8-sig forces Excel to open file with uft-8
+    # utf-8-sig forces Excel to open file with uft-8
+    with open(full_path, 'w', newline='', encoding='utf-8-sig') as f:
         f.write("Language;Number;Numeral\n")  # header
         f.write(string)
 
 
-def find_lang_short(list_item):
+def find_lang_short(list_item) -> str:
     """
     Returns last suffix without "/" of the given website, which is used for posting requests to the server.
     :param list_item: List item of lst_of_links
@@ -113,13 +115,17 @@ def find_lang_long(list_item):
 #     return print(end="\r" + "░" * 81 + "┃\r┃" + "█" * int(80 * counter / (len(lst_of_links) - 1)) + "%6.2f %%" % (
 #             counter / (len(lst_of_links) - 1) * 100))
 
+
 def collapse(layout, key, visible):
     """
     See https://stackoverflow.com/a/63471167
-    Helper function that creates a Column that can be later made hidden, thus appearing "collapsed"
+    Helper function that creates a Column that can be later made hidden, thus appearing "collapsed".
+    The purpose of this function is to create a collapsible section in a GUI using the PySimpleGUI library. By default, all sections created using PySimpleGUI are visible. However, this function allows the user to create a section that is initially hidden and can be made visible later by setting the visible attribute of the section to True.
+
+    The pin method is used to ensure that the column is not resized or moved by the user when it is visible. This ensures that the collapsed section always occupies the same space in the layout, whether it is visible or not.
     :param layout: The layout for the section
     :param key: Key used to make this section visible / invisible
-    :param visible: visible determines if section is rendered visible or invisible on initialization
+    :param visible: A boolean value that determines if the section is initially visible or not.
     :return: A pinned column that can be placed directly into your layout
     :rtype: sg.pin
     """
@@ -152,7 +158,8 @@ def create_main_window():
               [sg.InputText(default_text=CURRENT_WORKING_DIR, text_color="lightgray",
                             tooltip="Enter desired path for the csv-file!", border_width=0), sg.FolderBrowse()],
               [collapse(hidden_sec, 'hidden_sec', True)],
-              [sg.Checkbox(text="Scrape all languages", default=False, key='-CB-', enable_events=True)],
+              [sg.Checkbox(text="Scrape all languages",
+                           default=False, key='-CB-', enable_events=True)],
               [sg.Button("OK", font=("Helvetica", "10", "bold"), border_width=0), sg.Button("Exit", border_width=0)]]
 
     window = sg.Window('Web-Scraper', layout, finalize=True, resizable=True, auto_size_text=True,
@@ -178,13 +185,15 @@ def create_main_window():
                     logging.error("Path is not a directory or does not exist.")
                     create_pop_up_window(mode="path")
                     continue
-            except ValueError as eval:
-                logging.error("Values 0-2 contains non integer values.: %s", eval)
+            except ValueError as valerr:
+                logging.error(
+                    "Values 0-2 contains non integer values.: %s", valerr)
                 create_pop_up_window()
                 continue
             window.close()
             break
     return event, values
+
 
 def create_pop_up_window(mode=""):
     """
@@ -197,7 +206,7 @@ def create_pop_up_window(mode=""):
         text = "Please enter only integer values in the text fields!"
     sg.theme('Dark Gray 13')
     layout_col = [[sg.Text(text, font=("Helvetica", "10", "bold"), text_color="red", justification="center")],
-              [sg.Button("OK", font=("Helvetica", "10", "bold"), border_width=0)]]
+                  [sg.Button("OK", font=("Helvetica", "10", "bold"), border_width=0)]]
     layout = [[sg.Column(layout_col, element_justification="center")]]
     window = sg.Window('Error', layout, finalize=True, resizable=True, auto_size_text=True,
                        auto_size_buttons=True, no_titlebar=True, grab_anywhere=True, keep_on_top=True)
@@ -206,6 +215,8 @@ def create_pop_up_window(mode=""):
         if event in (sg.WIN_CLOSED, 'OK'):
             window.close()
             break
+    return event, values
+
 
 def progress_bar_meter(counter):
     """
@@ -244,7 +255,7 @@ if __name__ == '__main__':
                                 timeout=REQ_TIMEOUT)
             page.raise_for_status()  # raises error if status code is between 400-600
         except (requests.exceptions.HTTPError, requests.exceptions.ConnectionError, requests.exceptions.Timeout,
-        requests.exceptions.RequestException) as e:
+                requests.exceptions.RequestException) as e:
             logging.error('1 Error: %s', e)
             logging.info("Trying again...")
             retries += 1
@@ -254,7 +265,7 @@ if __name__ == '__main__':
             break
     else:
         sg.SystemTray.notify("Too many retries", "Closing program...", display_duration_in_ms=750,
-                                 fade_in_duration=100, icon=ICON_WARNING)
+                             fade_in_duration=100, icon=ICON_WARNING)
         logging.info('Reached max retries, closing program.')
         sys.exit(1)
 
@@ -274,7 +285,8 @@ if __name__ == '__main__':
 
     for link in lst_of_links:
         page = requests.get(main_link + link, headers=HEADERS)
-        soup = BeautifulSoup(page.content, features="lxml", parse_only=SoupStrainer(id='number-form'))
+        soup = BeautifulSoup(page.content, features="lxml",
+                             parse_only=SoupStrainer(id='number-form'))
         form = soup.find_all(id='number-form')
 
         lang = find_lang_short(link)
@@ -285,9 +297,10 @@ if __name__ == '__main__':
             # lst_of_words = lst_of_words + find_lang_long(link) + ";" + '-1' + ";" + "Language not supported.\n"
             continue
         if selected_lang == "" and not progress_bar_meter(count):
-            logging.info('Process cancelled by clicking cancel button for link %s.', str(link))
+            logging.info(
+                'Process cancelled by clicking cancel button for link %s.', str(link))
             sg.SystemTray.notify("Cancelled", "Closing program...", display_duration_in_ms=750, fade_in_duration=50,
-                                     icon=ICON_CANCEL)
+                                 icon=ICON_CANCEL)
             sys.exit(1)
 
         for i in range(start, end, step):
@@ -297,9 +310,10 @@ if __name__ == '__main__':
                                 str(lang))
                 continue
             if selected_lang != "" and not progress_bar_meter(count_inner):
-                logging.info('Progress cancelled (inner) for i=%s and link=%s', str(i), str(link))
+                logging.info(
+                    'Progress cancelled (inner) for i=%s and link=%s', str(i), str(link))
                 sg.SystemTray.notify("Cancelled", "Closing program...", display_duration_in_ms=750,
-                                         fade_in_duration=100, icon=ICON_CANCEL)
+                                     fade_in_duration=100, icon=ICON_CANCEL)
                 sys.exit(1)
             # requests.Session uses single TCP-connection for sending/receiving HTTP multi reqs/resps
             # saves time over opening a new connection for every single req/resp pair, see
@@ -314,30 +328,34 @@ if __name__ == '__main__':
                         logging.info('POST method - params: {numberz: %s, lang: %s (%s)}', str(i), str(lang),
                                      str(find_lang_long(link)))
 
-                        time.sleep(random.uniform(1, 3))  # sleep between 1 and 3 seconds to avoid server timeouts
+                        # sleep between 1 and 3 seconds to avoid server timeouts
+                        time.sleep(random.uniform(1, 3))
 
                         response.raise_for_status()
                     except (requests.exceptions.HTTPError, requests.exceptions.ConnectionError, requests.exceptions.Timeout) as err:
-                        logging.error("Error while retrieving response of %s: %s", str(lang), err)
+                        logging.error(
+                            "Error while retrieving response of %s: %s", str(lang), err)
                         logging.info("Trying again...")
                         retries += 1
                         if isinstance(err, requests.exceptions.ConnectionError):
                             time.sleep(3)  # replugging ethernet cable is slow
                     except requests.exceptions.RequestException as err:
-                        logging.error("UnspecifiedError while retrieving response of %s: %s", str(lang), err)
+                        logging.error(
+                            "UnspecifiedError while retrieving response of %s: %s", str(lang), err)
                         logging.info("Trying again...")
                         retries += 1
                     else:
                         break
                 else:
                     logging.info('Too many retries while trying to post query i=%s and link=%s', str(i),
-                                     str(link))
+                                 str(link))
                     sg.SystemTray.notify("Too many retries", "Closing program...", display_duration_in_ms=750,
-                                             fade_in_duration=100, icon=ICON_WARNING)
+                                         fade_in_duration=100, icon=ICON_WARNING)
                     sys.exit(1)
 
                 # parse response
-                soup = BeautifulSoup(response.content, "lxml", from_encoding="utf-8")
+                soup = BeautifulSoup(
+                    response.content, "lxml", from_encoding="utf-8")
 
                 # if number is not supported by server, ignore it
                 # soup.get_text().split(':')[-1].split('.')[0] == "This number is too big":
@@ -350,7 +368,8 @@ if __name__ == '__main__':
                 else:
                     # soup.get_text(separator=" ", strip=True).split(':', 3)[-1]
                     lst_of_words = lst_of_words + find_lang_long(link) + ";" + str(i) + ";" + \
-                                   soup.get_text(separator=" ", strip=True).split(':', 3)[-1] + "\n"
+                        soup.get_text(separator=" ", strip=True).split(
+                            ':', 3)[-1] + "\n"
             count_inner += 1
         count += 1
     alt_path = ""
@@ -378,14 +397,17 @@ if __name__ == '__main__':
         else:
             break
     else:
-        logging.warning("Max retries reached while trying to write .csv file, closing program.")
+        logging.warning(
+            "Max retries reached while trying to write .csv file, closing program.")
         sg.SystemTray.notify("Max retries reached", "Closing program...", display_duration_in_ms=750,
-                                     fade_in_duration=100, icon=ICON_WARNING)
+                             fade_in_duration=100, icon=ICON_WARNING)
         sys.exit(1)
 
     seconds = time.time() - start_time
 
-    logging.info("Program executed in %s", time.strftime("%H:%M:%S (hh:mm:ss)", time.gmtime(seconds)))
+    logging.info("Program executed in %s", time.strftime(
+        "%H:%M:%S (hh:mm:ss)", time.gmtime(seconds)))
     sg.SystemTray.notify("Finished",
-                         str("Program executed in " + time.strftime("%H:%M:%S (hh:mm:ss)", time.gmtime(seconds))),
+                         str("Program executed in " +
+                             time.strftime("%H:%M:%S (hh:mm:ss)", time.gmtime(seconds))),
                          display_duration_in_ms=750, fade_in_duration=100)
