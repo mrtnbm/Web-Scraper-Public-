@@ -1,7 +1,7 @@
 import unittest
 import os
+from unittest.mock import Mock, patch
 import PySimpleGUI as sg
-from unittest.mock import Mock, patch, MagicMock
 from web_scraper_all import parse_save_website, write_csv, find_lang_short, find_lang_long, collapse, create_main_window
 
 
@@ -123,14 +123,13 @@ class TestCreateMainWindowLoop(unittest.TestCase):
 	def test_create_main_window_loop_with_user_input(self, mock_sg_window, mock_create_pop_up_window):
 		mock_sg_window_instance = mock_sg_window.return_value
 		mock_sg_window_instance.read.side_effect = [('OK', {0: '1', 1: '2', 2: '1', 3: os.path.dirname(__file__), 'Browse': os.path.dirname(__file__), 'inputtxt': '', '-CB-': False}),
-							('Exit', {0: '1', 1: '2', 2: '1', 3: os.path.dirname(__file__), 'Browse': os.path.dirname(__file__), 'inputtxt': '', '-CB-': False}),
-							StopIteration]
-		with self.assertRaises(StopIteration):
-			create_main_window()
-			create_main_window()
+							('Exit', {0: '1', 1: '2', 2: '1', 3: os.path.dirname(__file__), 'Browse': os.path.dirname(__file__), 'inputtxt': '', '-CB-': False})]
+		#with self.assertRaises(StopIteration):
+		create_main_window()
+		create_main_window()
 
 		self.assertEqual(mock_sg_window.call_count, 2)
-		self.assertEqual(mock_sg_window_instance.close.call_count, 1)
+		self.assertEqual(mock_sg_window_instance.close.call_count, 2)
 		self.assertEqual(mock_create_pop_up_window.call_count, 0)
 		# self.assertEqual(event, 'Exit')
 		# self.assertEqual(values, {})

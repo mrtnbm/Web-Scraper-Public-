@@ -171,7 +171,8 @@ def create_main_window():
         event, values = window.read()
         if event in (sg.WIN_CLOSED, 'Exit'):
             window.close()
-            sys.exit(0)
+            # sys.exit(0)
+            return "", {}
         if event == "-CB-":
             toggle_sec1 = not toggle_sec1
             window['hidden_sec'].update(visible=toggle_sec1)
