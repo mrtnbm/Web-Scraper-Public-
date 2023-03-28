@@ -34,7 +34,7 @@ jobs:
       - name: remove req-frozen.txt
         run: git rm --ignore-unmatch requirements-frozen.txt && rm -f requirements-frozen.txt
       - name: Git Pull & refresh index
-        run: git pull && git update-index --refresh && git add reports/snyk-issues.json
+        run: git add reports/snyk-issues.json && git pull && git update-index --refresh
       - run: |
           if git diff-index --quiet HEAD --; then
             echo "IS_FILE_CHANGED=true" >> $GITHUB_ENV
