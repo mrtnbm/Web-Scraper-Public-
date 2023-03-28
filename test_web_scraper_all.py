@@ -15,7 +15,7 @@ from web_scraper_all import (
 # create virtual display with size 1600x1200 and 16 bit color. Color can be changed to 24 or 8
 os.system("Xvfb :1 -screen 0 1600x1200x16  &")
 # tell X clients to use our virtual DISPLAY :1.0.
-os.environ["DISPLAY"] = ":1.0"
+os.environ["DISPLAY"] = ':1.0'
 
 
 class TestParseSaveWebsite(unittest.TestCase):
