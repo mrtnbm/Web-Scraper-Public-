@@ -384,7 +384,7 @@ if __name__ == "__main__":
     retries = 0
 
     for link in lst_of_links:
-        page = requests.get(main_link + link, headers=HEADERS)
+        page = requests.get(main_link + link, headers=HEADERS, timeout=REQ_TIMEOUT)
         soup = BeautifulSoup(page.content, features="lxml", parse_only=SoupStrainer(id="number-form"))
         form = soup.find_all(id="number-form")
 
