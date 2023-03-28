@@ -36,11 +36,11 @@ jobs:
       - name: Git Pull & refresh index
         run: git add reports/snyk-issues.json && git pull && git update-index --refresh
       - run: |
-          if git diff-index --cached --quiet HEAD --; then
+           if git status --porcelain | grep -q "^M\|^A\|^D"; then
             echo "IS_FILE_CHANGED=true" >> $GITHUB_ENV
-          else
+           else
             echo "IS_FILE_CHANGED=false" >> $GITHUB_ENV
-          fi
+           fi
       - if: ${{ env.IS_FILE_CHANGED == true}}
         name: Commit & Push Artifacts to Repo
         uses: stefanzweifel/git-auto-commit-action@v4
