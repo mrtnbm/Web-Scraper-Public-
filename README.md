@@ -10,7 +10,9 @@ Scrapes all numerals listed at [languagesandnumbers.com](https://www.languagesan
 ### Binary
 - Download the .exe-file from the [releases tab](https://github.com/mrtnbm/Web-Scraper-Public-/releases). Double-click to execute.
 ### Use/build from Source 
-- [Download](https://github.com/mrtnbm/Web-Scraper-Public-/archive/refs/heads/main.zip) and unzip source code or clone the repository with `git clone  https://github.com/mrtnbm/Web-Scraper-Public-.git`
+- [Download](https://github.com/mrtnbm/Web-Scraper-Public-/archive/refs/heads/main.zip) and unzip source code or clone the repository with `git clone https://github.com/mrtnbm/Web-Scraper-Public-.git`
+- Install Python 3.9+ `sudo apt install python3.9`
+- Install requirements `pip install -r requirements.txt` 
 - Start script with `python web-scraper-all.py`.
 ### Build binary yourself
 - Execute ```pyinstaller -wF web-scraper-all.py```.
