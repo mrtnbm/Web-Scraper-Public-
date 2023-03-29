@@ -12,8 +12,9 @@ Scrapes all numerals listed at [languagesandnumbers.com](https://www.languagesan
 ### Use/build from Source 
 - [Download](https://github.com/mrtnbm/Web-Scraper-Public-/archive/refs/heads/main.zip) and unzip source code or clone the repository with `git clone https://github.com/mrtnbm/Web-Scraper-Public-.git`
 - Install Python 3.9+ `sudo apt install python3.9`
+- Optionally update pip, setuptools, wheel: `python3 -m pip install --upgrade pip setuptools wheel`
 - Install requirements `pip install -r requirements.txt` 
-- Start script with `python web-scraper-all.py`.
+- Start script with `python3 web-scraper-all.py` resp. `python web-scraper-all.py` on Windows.
 ### Build binary yourself
 - Execute ```pyinstaller -wF web-scraper-all.py```.
 ### Run tests
