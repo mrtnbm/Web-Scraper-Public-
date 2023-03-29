@@ -22,3 +22,4 @@ Scrapes all numerals listed at [languagesandnumbers.com](https://www.languagesan
 - refactor main (more seperate functions, less code in main)
 - refactor to meet OOP standards
 - fix all code smells
+- redirect uploading artifacts to deploy outside of repository
