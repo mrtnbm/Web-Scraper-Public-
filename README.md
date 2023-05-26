@@ -8,6 +8,7 @@ Web Scraper for extracting numerals of all languages from languagesandnumbers.co
 Scrapes all numerals listed at [languagesandnumbers.com](https://www.languagesandnumbers.com/) from all 251 languages. Furthermore, the scraped numerals get saved in a CSV-File in the desired script-path which can be viewed in any editor for later analysis. A progress bar indicates how many websites are left.
 ## Execution
 ### Binary
+#### [Note: Releases are Outdated, I will update them soon when I finished most of the aspects listed in the TODOs. For now, please build the project manually.] 
 - Download the .exe-file from the [releases tab](https://github.com/mrtnbm/Web-Scraper-Public-/releases). Double-click to execute.
 ### Use/build from Source 
 - [Download](https://github.com/mrtnbm/Web-Scraper-Public-/archive/refs/heads/main.zip) and unzip source code or clone the repository with `git clone https://github.com/mrtnbm/Web-Scraper-Public-.git`
