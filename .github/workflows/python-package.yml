@@ -138,7 +138,7 @@ jobs:
           fi
     - if: ${{ env.IS_FILE_CHANGED == true }}
       name: Commit & Push Artifacts to Repo
-      uses: stefanzweifel/git-auto-commit-action@v4
+      uses: stefanzweifel/git-auto-commit-action@v5
       with:
         # Optional. Commit message for the created commit.
         # Defaults to "Apply automatic changes"
